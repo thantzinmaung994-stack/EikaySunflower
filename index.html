@@ -1,0 +1,793 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { 
+  Sun, Menu, X, Globe, User, LogIn, Calendar, BookOpen, 
+  MessageCircle, Phone, Mail, CheckCircle, PlayCircle, 
+  FileText, Shield, CreditCard, Users, BarChart, Settings,
+  LogOut, ChevronRight, Video, Download, HelpCircle
+} from 'lucide-react';
+
+/**
+ * MOCK DATA & TRANSLATIONS
+ */
+const TRANSLATIONS = {
+  ja: {
+    nav_home: "ホーム",
+    nav_courses: "講座・料金",
+    nav_booking: "予約",
+    nav_contact: "お問い合わせ",
+    nav_login: "ログイン",
+    nav_mypage: "マイページ",
+    hero_title: "日本で頑張るあなたのための介護福祉士講座",
+    hero_subtitle: "ミャンマー語と日本語で学び、国家資格合格を目指しましょう。EikaySunflowerが全力でサポートします。",
+    cta_consult: "無料相談を予約",
+    cta_apply: "講座に申し込む",
+    section_courses: "コース一覧",
+    section_voice: "受講生の声",
+    section_faq: "よくある質問",
+    label_messenger: "Messengerで相談",
+    role_admin: "管理者",
+    role_student: "受講生",
+    status_pending: "未対応",
+    status_confirmed: "確定",
+    login_placeholder: "メールアドレス",
+    pass_placeholder: "パスワード",
+    welcome: "ようこそ",
+    logout: "ログアウト",
+  },
+  my: {
+    nav_home: "ပင်မစာမျက်နှာ", // Home
+    nav_courses: "သင်တန်းများ", // Courses
+    nav_booking: "ရက်ချိန်းယူရန်", // Booking
+    nav_contact: "ဆက်သွယ်ရန်", // Contact
+    nav_login: "အကောင့်ဝင်ရန်", // Login
+    nav_mypage: "ကျွန်ုပ်၏စာမျက်နှာ", // My Page
+    hero_title: "ဂျပန်နိုင်ငံရောက် မြန်မာများအတွက် ပြုစုစောင့်ရှောက်ရေးသင်တန်း",
+    hero_subtitle: "မြန်မာဘာသာနှင့် ဂျပန်ဘာသာဖြင့် လေ့လာပြီး နိုင်ငံတော်အသိအမှတ်ပြု လက်မှတ်ရယူကြပါစို့။",
+    cta_consult: "အခမဲ့ ဆွေးနွေးရန်",
+    cta_apply: "သင်တန်းအပ်ရန်",
+    section_courses: "သင်တန်းများ",
+    section_voice: "ကျောင်းသားများ၏ စကားသံ",
+    section_faq: "မေးလေ့ရှိသော မေးခွန်းများ",
+    label_messenger: "Messenger ဖြင့်ပြောပါ",
+    role_admin: "Admin",
+    role_student: "Student",
+    status_pending: "ဆိုင်းငံ့",
+    status_confirmed: "အတည်ပြုပြီး",
+    login_placeholder: "အီးမေးလ်",
+    pass_placeholder: "စကားဝှက်",
+    welcome: "မင်္ဂလာပါ",
+    logout: "ထွက်ရန်",
+  }
+};
+
+const COURSES = [
+  {
+    id: 1,
+    title: "目指そう介護福祉士 Video Class",
+    title_my: "Kaigo Fukushishi Video Class",
+    price: "¥45,000",
+    type: "Online (Video)",
+    features: ["24時間視聴可能", "ミャンマー語字幕", "模擬試験付き"],
+    color: "bg-orange-100 border-orange-300"
+  },
+  {
+    id: 2,
+    title: "目指そう介護 Zoom Live Class",
+    title_my: "Kaigo Fukushishi Zoom Class",
+    price: "¥68,000",
+    type: "Online (Zoom)",
+    features: ["講師に直接質問", "仲間と学習", "アーカイブ配信あり"],
+    color: "bg-yellow-100 border-yellow-300"
+  },
+  {
+    id: 3,
+    title: "特定技能試験対策コース",
+    title_my: "Tokutei Ginou Test Prep",
+    price: "¥25,000",
+    type: "Short Course",
+    features: ["短期集中", "専門用語特化", "合格保証制度あり"],
+    color: "bg-blue-50 border-blue-200"
+  }
+];
+
+const REVIEWS = [
+  { id: 1, name: "Aung San (N3)", msg: "先生の説明がとても分かりやすいです。働きながらでも合格できました！", course: "Video Class" },
+  { id: 2, name: "Thida (N2)", msg: "Zoomクラスで仲間ができたのでモチベーションが続きました。", course: "Zoom Class" },
+];
+
+/**
+ * MAIN APP COMPONENT
+ */
+export default function App() {
+  const [lang, setLang] = useState('ja'); // 'ja' or 'my'
+  const [page, setPage] = useState('home'); // home, courses, booking, contact, login, dashboard, admin
+  const [user, setUser] = useState(null); // null, { role: 'student' | 'admin', name: '...' }
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const t = (key) => TRANSLATIONS[lang][key] || key;
+
+  // Simple Mock Login
+  const handleLogin = (role) => {
+    if (role === 'admin') {
+      setUser({ role: 'admin', name: 'Admin Staff', id: 'ADM-001' });
+      setPage('admin');
+    } else {
+      setUser({ role: 'student', name: 'Su Su', id: 'ZC-2026-000123', progress: 45 });
+      setPage('dashboard');
+    }
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setPage('home');
+  };
+
+  const navigate = (target) => {
+    setPage(target);
+    setIsMenuOpen(false);
+    window.scrollTo(0, 0);
+  };
+
+  // --- SUB-COMPONENTS ---
+
+  const Navbar = () => (
+    <nav className="sticky top-0 z-50 bg-white shadow-sm border-b border-yellow-100">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between h-16">
+          <div className="flex items-center cursor-pointer" onClick={() => navigate('home')}>
+            <Sun className="h-8 w-8 text-yellow-500 mr-2" />
+            <span className="font-bold text-xl text-gray-800 tracking-tight">
+              Eikay<span className="text-yellow-600">Sunflower</span>
+            </span>
+          </div>
+
+          {/* Desktop Nav */}
+          <div className="hidden md:flex items-center space-x-6">
+            <button onClick={() => navigate('courses')} className="text-gray-600 hover:text-yellow-600 font-medium">{t('nav_courses')}</button>
+            <button onClick={() => navigate('booking')} className="text-gray-600 hover:text-yellow-600 font-medium">{t('nav_booking')}</button>
+            <button onClick={() => navigate('contact')} className="text-gray-600 hover:text-yellow-600 font-medium">{t('nav_contact')}</button>
+            
+            {user ? (
+              <div className="flex items-center space-x-3">
+                <button 
+                  onClick={() => navigate(user.role === 'admin' ? 'admin' : 'dashboard')}
+                  className="bg-yellow-100 text-yellow-800 px-3 py-1.5 rounded-full flex items-center text-sm font-medium"
+                >
+                  <User className="w-4 h-4 mr-1" />
+                  {user.role === 'admin' ? t('role_admin') : t('nav_mypage')}
+                </button>
+                <button onClick={handleLogout} className="text-gray-400 hover:text-red-500">
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            ) : (
+              <button 
+                onClick={() => navigate('login')} 
+                className="bg-yellow-500 hover:bg-yellow-400 text-white px-5 py-2 rounded-full font-medium transition flex items-center shadow-md"
+              >
+                <LogIn className="w-4 h-4 mr-1" />
+                {t('nav_login')}
+              </button>
+            )}
+
+            <button 
+              onClick={() => setLang(lang === 'ja' ? 'my' : 'ja')}
+              className="flex items-center text-gray-500 hover:text-blue-600 border px-2 py-1 rounded"
+            >
+              <Globe className="w-4 h-4 mr-1" />
+              {lang === 'ja' ? '日本語' : 'မြန်မာ'}
+            </button>
+          </div>
+
+          {/* Mobile menu button */}
+          <div className="flex items-center md:hidden">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-gray-600 p-2">
+              {isMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Mobile Nav */}
+      {isMenuOpen && (
+        <div className="md:hidden bg-white border-t border-gray-100 pb-4">
+          <div className="px-2 pt-2 space-y-1">
+            <button onClick={() => navigate('courses')} className="block w-full text-left px-3 py-3 text-gray-700 hover:bg-yellow-50 rounded-md">{t('nav_courses')}</button>
+            <button onClick={() => navigate('booking')} className="block w-full text-left px-3 py-3 text-gray-700 hover:bg-yellow-50 rounded-md">{t('nav_booking')}</button>
+            <button onClick={() => navigate('contact')} className="block w-full text-left px-3 py-3 text-gray-700 hover:bg-yellow-50 rounded-md">{t('nav_contact')}</button>
+            <div className="border-t my-2"></div>
+            <button onClick={() => setLang(lang === 'ja' ? 'my' : 'ja')} className="block w-full text-left px-3 py-3 text-blue-600">
+               Language: {lang === 'ja' ? '日本語' : 'မြန်မာ'}
+            </button>
+            {!user ? (
+              <button onClick={() => navigate('login')} className="block w-full text-left px-3 py-3 text-yellow-600 font-bold">{t('nav_login')}</button>
+            ) : (
+               <button onClick={handleLogout} className="block w-full text-left px-3 py-3 text-red-500">{t('logout')}</button>
+            )}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+
+  const Footer = () => (
+    <footer className="bg-gray-800 text-white pt-10 pb-6">
+      <div className="max-w-7xl mx-auto px-4 grid md:grid-cols-4 gap-8">
+        <div>
+          <h3 className="text-lg font-bold text-yellow-400 mb-4 flex items-center">
+            <Sun className="w-5 h-5 mr-2" /> EikaySunflower
+          </h3>
+          <p className="text-gray-400 text-sm">
+            ミャンマーの皆様の日本でのキャリアアップを支援する介護教育プラットフォーム。
+          </p>
+        </div>
+        <div>
+          <h4 className="font-bold mb-4">Link</h4>
+          <ul className="space-y-2 text-sm text-gray-400">
+            <li onClick={() => navigate('home')} className="cursor-pointer hover:text-white">Home</li>
+            <li onClick={() => navigate('courses')} className="cursor-pointer hover:text-white">Courses</li>
+            <li onClick={() => navigate('booking')} className="cursor-pointer hover:text-white">Booking</li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-bold mb-4">Legal</h4>
+          <ul className="space-y-2 text-sm text-gray-400">
+            <li>特定商取引法に基づく表記</li>
+            <li>プライバシーポリシー</li>
+            <li>利用規約</li>
+          </ul>
+        </div>
+        <div>
+          <h4 className="font-bold mb-4">Contact</h4>
+          <div className="flex space-x-4">
+            <button className="bg-blue-600 p-2 rounded-full hover:bg-blue-500 transition">
+              <MessageCircle className="w-5 h-5" />
+            </button>
+            <button className="bg-green-600 p-2 rounded-full hover:bg-green-500 transition">
+              <Phone className="w-5 h-5" />
+            </button>
+          </div>
+        </div>
+      </div>
+      <div className="text-center text-gray-600 text-xs mt-10 border-t border-gray-700 pt-4">
+        &copy; 2026 EikaySunflower All Rights Reserved.
+      </div>
+    </footer>
+  );
+
+  // --- PAGE CONTENT ---
+
+  const Home = () => (
+    <div className="animate-fade-in">
+      {/* Hero Section */}
+      <div className="relative bg-gradient-to-br from-yellow-50 to-orange-100 py-20 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 gap-12 items-center relative z-10">
+          <div>
+            <span className="inline-block bg-yellow-200 text-yellow-800 px-3 py-1 rounded-full text-sm font-semibold mb-4">
+              {lang === 'ja' ? 'ミャンマー人向け介護講座' : 'Myanmar Care Worker Course'}
+            </span>
+            <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight mb-6">
+              {t('hero_title')}
+            </h1>
+            <p className="text-lg text-gray-700 mb-8 leading-relaxed">
+              {t('hero_subtitle')}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button 
+                onClick={() => navigate('booking')}
+                className="bg-yellow-500 hover:bg-yellow-400 text-white px-8 py-3 rounded-lg font-bold text-lg shadow-lg hover:shadow-xl transition flex items-center justify-center"
+              >
+                <Calendar className="w-5 h-5 mr-2" />
+                {t('cta_consult')}
+              </button>
+              <button 
+                onClick={() => navigate('courses')}
+                className="bg-white border-2 border-yellow-500 text-yellow-600 hover:bg-yellow-50 px-8 py-3 rounded-lg font-bold text-lg transition flex items-center justify-center"
+              >
+                <BookOpen className="w-5 h-5 mr-2" />
+                {t('cta_apply')}
+              </button>
+            </div>
+          </div>
+          <div className="relative">
+             <div className="absolute inset-0 bg-yellow-300 rounded-full blur-3xl opacity-20 transform translate-x-10 translate-y-10"></div>
+             {/* Mock Image Placeholder */}
+             <div className="bg-white p-4 rounded-2xl shadow-xl transform rotate-2 hover:rotate-0 transition duration-500">
+                <div className="bg-gray-200 h-64 md:h-80 rounded-xl flex items-center justify-center overflow-hidden">
+                  <div className="text-center">
+                    <Users className="w-16 h-16 text-gray-400 mx-auto mb-2" />
+                    <span className="text-gray-500 font-medium">笑顔で学習する受講生たち<br/>(Happy Students Image)</span>
+                  </div>
+                </div>
+                <div className="mt-4 flex items-center justify-between">
+                   <div className="flex -space-x-2">
+                      {[1,2,3].map(i => (
+                        <div key={i} className="w-8 h-8 rounded-full bg-gray-300 border-2 border-white"></div>
+                      ))}
+                   </div>
+                   <div className="text-sm font-bold text-gray-600">
+                     150+ 合格実績
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Reviews */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12 text-gray-800">{t('section_voice')}</h2>
+          <div className="grid md:grid-cols-2 gap-8">
+            {REVIEWS.map(r => (
+              <div key={r.id} className="bg-gray-50 p-6 rounded-xl border border-gray-100 shadow-sm">
+                <div className="flex items-center mb-4">
+                  <div className="w-10 h-10 bg-yellow-200 rounded-full flex items-center justify-center font-bold text-yellow-700">
+                    {r.name.charAt(0)}
+                  </div>
+                  <div className="ml-3">
+                    <p className="font-bold text-gray-900">{r.name}</p>
+                    <p className="text-xs text-gray-500">{r.course}</p>
+                  </div>
+                </div>
+                <p className="text-gray-600 italic">"{r.msg}"</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Floating Messenger Button */}
+      <div className="fixed bottom-6 right-6 z-40">
+        <button className="bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-2xl flex items-center transition transform hover:scale-105">
+          <MessageCircle className="w-6 h-6 mr-2" />
+          <span className="font-bold hidden sm:block">{t('label_messenger')}</span>
+        </button>
+      </div>
+    </div>
+  );
+
+  const CoursesPage = () => (
+    <div className="py-12 px-4 max-w-7xl mx-auto">
+      <h2 className="text-3xl font-bold text-center mb-4 text-gray-800">{t('section_courses')}</h2>
+      <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+        あなたのライフスタイルに合わせた学習スタイルを選べます。分割払いも可能です。
+      </p>
+
+      <div className="grid md:grid-cols-3 gap-8">
+        {COURSES.map(course => (
+          <div key={course.id} className={`rounded-2xl overflow-hidden border-2 ${course.color} transition hover:shadow-lg bg-white flex flex-col`}>
+            <div className="p-6 flex-grow">
+              <div className="inline-block px-3 py-1 bg-white rounded-full text-xs font-bold text-gray-500 border border-gray-200 mb-4">
+                {course.type}
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">{lang === 'ja' ? course.title : course.title_my}</h3>
+              <div className="text-3xl font-bold text-yellow-600 mb-6">{course.price} <span className="text-sm text-gray-500 font-normal">/ コース</span></div>
+              
+              <ul className="space-y-3 mb-6">
+                {course.features.map((f, i) => (
+                  <li key={i} className="flex items-start text-sm text-gray-600">
+                    <CheckCircle className="w-5 h-5 text-green-500 mr-2 flex-shrink-0" />
+                    {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="p-6 bg-gray-50 border-t border-gray-100">
+              <button onClick={() => navigate('booking')} className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg font-bold transition">
+                詳細を見る・予約
+              </button>
+              <p className="text-center text-xs text-gray-500 mt-2">※分割払い相談可</p>
+            </div>
+          </div>
+        ))}
+      </div>
+      
+      {/* Cancellation Policy Snippet */}
+      <div className="mt-16 bg-gray-50 p-6 rounded-lg text-sm text-gray-600">
+        <h4 className="font-bold mb-2 flex items-center"><Shield className="w-4 h-4 mr-2"/> キャンセル・返金について</h4>
+        <p>受講開始日の8日前までのキャンセルは全額返金いたします。それ以降のキャンセルにつきましては、規定のキャンセル料が発生します。詳細は利用規約をご確認ください。</p>
+      </div>
+    </div>
+  );
+
+  const BookingPage = () => {
+    const [step, setStep] = useState(1);
+    
+    return (
+      <div className="py-12 px-4 max-w-3xl mx-auto">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold text-gray-800 mb-2">Web予約</h2>
+          <p className="text-gray-600">無料相談・授業の予約はこちらから</p>
+        </div>
+
+        <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+          {/* Progress Bar */}
+          <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-b border-gray-200">
+            <div className={`flex items-center ${step >= 1 ? 'text-yellow-600' : 'text-gray-400'}`}>
+              <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold mr-2">1</div>
+              <span className="text-sm font-medium">日時選択</span>
+            </div>
+            <div className="h-px bg-gray-300 w-12"></div>
+            <div className={`flex items-center ${step >= 2 ? 'text-yellow-600' : 'text-gray-400'}`}>
+              <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold mr-2">2</div>
+              <span className="text-sm font-medium">情報入力</span>
+            </div>
+            <div className="h-px bg-gray-300 w-12"></div>
+            <div className={`flex items-center ${step >= 3 ? 'text-yellow-600' : 'text-gray-400'}`}>
+              <div className="w-6 h-6 rounded-full border-2 border-current flex items-center justify-center text-xs font-bold mr-2">3</div>
+              <span className="text-sm font-medium">完了</span>
+            </div>
+          </div>
+
+          <div className="p-8">
+            {step === 1 && (
+              <div className="animate-fade-in">
+                <h3 className="font-bold text-lg mb-4">ご希望のメニュー</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                  <button className="p-4 border-2 border-yellow-500 bg-yellow-50 rounded-lg text-left">
+                    <div className="font-bold text-yellow-800">無料説明会・相談</div>
+                    <div className="text-xs text-gray-600 mt-1">30分 / オンライン</div>
+                  </button>
+                  <button className="p-4 border border-gray-200 hover:border-yellow-300 rounded-lg text-left">
+                    <div className="font-bold text-gray-800">個別授業予約</div>
+                    <div className="text-xs text-gray-600 mt-1">会員限定 / 60分</div>
+                  </button>
+                </div>
+
+                <h3 className="font-bold text-lg mb-4">カレンダー (2026年 3月)</h3>
+                <div className="grid grid-cols-7 gap-2 mb-6 text-center text-sm">
+                  {['日','月','火','水','木','金','土'].map(d => <div key={d} className="text-gray-400 font-bold">{d}</div>)}
+                  {/* Mock Calendar Days */}
+                  {Array.from({length: 31}, (_, i) => i + 1).map(d => (
+                    <button 
+                      key={d}
+                      disabled={d % 7 === 0 || d < 6} // Mock disabled logic
+                      onClick={() => setStep(2)}
+                      className={`
+                        p-2 rounded hover:bg-yellow-100 transition
+                        ${d === 15 ? 'bg-yellow-500 text-white hover:bg-yellow-600' : ''}
+                        ${(d % 7 === 0 || d < 6) ? 'text-gray-300 cursor-not-allowed' : 'text-gray-700'}
+                      `}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+                <div className="flex justify-end text-xs text-gray-500 space-x-4">
+                  <span className="flex items-center"><div className="w-3 h-3 bg-white border border-gray-300 mr-1"></div> 空きあり</span>
+                  <span className="flex items-center"><div className="w-3 h-3 bg-gray-200 mr-1"></div> 不可</span>
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="animate-fade-in space-y-4">
+                <h3 className="font-bold text-lg mb-6">お客様情報の入力</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">氏名 (ローマ字)</label>
+                    <input type="text" className="w-full border-gray-300 rounded-md shadow-sm p-2 border" placeholder="Aung San" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">氏名 (ミャンマー語)</label>
+                    <input type="text" className="w-full border-gray-300 rounded-md shadow-sm p-2 border" placeholder="(任意)" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">メールアドレス</label>
+                  <input type="email" className="w-full border-gray-300 rounded-md shadow-sm p-2 border" placeholder="example@email.com" />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">学習状況</label>
+                  <select className="w-full border-gray-300 rounded-md shadow-sm p-2 border">
+                    <option>初めて</option>
+                    <option>N3取得済み</option>
+                    <option>現在介護職で勤務中</option>
+                  </select>
+                </div>
+                
+                <div className="pt-4 flex justify-between">
+                  <button onClick={() => setStep(1)} className="text-gray-500 hover:text-gray-700">戻る</button>
+                  <button onClick={() => setStep(3)} className="bg-yellow-500 text-white px-6 py-2 rounded shadow hover:bg-yellow-400">確認して予約</button>
+                </div>
+              </div>
+            )}
+
+            {step === 3 && (
+              <div className="text-center py-10 animate-fade-in">
+                <div className="w-16 h-16 bg-green-100 text-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="w-8 h-8" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-800 mb-2">予約完了しました</h3>
+                <p className="text-gray-600 mb-8">
+                  ご登録のメールアドレスに確認メールを送信しました。<br/>
+                  当日お会いできるのを楽しみにしています。
+                </p>
+                <button onClick={() => setPage('home')} className="text-yellow-600 hover:underline">ホームに戻る</button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const LoginPage = () => (
+    <div className="min-h-[80vh] flex items-center justify-center bg-gray-50 px-4">
+      <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl font-bold text-gray-800">ログイン</h2>
+          <p className="text-sm text-gray-500 mt-2">EikaySunflower 会員サイト</p>
+        </div>
+        <div className="space-y-4">
+          <input type="email" placeholder={t('login_placeholder')} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none" />
+          <input type="password" placeholder={t('pass_placeholder')} className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-yellow-400 outline-none" />
+          <button 
+            onClick={() => handleLogin('student')}
+            className="w-full bg-yellow-500 hover:bg-yellow-400 text-white py-3 rounded-lg font-bold transition shadow-md"
+          >
+            ログイン (受講生Demo)
+          </button>
+          <button 
+            onClick={() => handleLogin('admin')}
+            className="w-full bg-gray-800 hover:bg-gray-700 text-white py-3 rounded-lg font-bold transition shadow-md"
+          >
+            管理者としてログイン (Demo)
+          </button>
+        </div>
+        <div className="mt-6 text-center text-sm">
+          <a href="#" className="text-blue-600 hover:underline">パスワードを忘れた方</a>
+          <span className="mx-2 text-gray-300">|</span>
+          <a href="#" className="text-blue-600 hover:underline">新規会員登録</a>
+        </div>
+      </div>
+    </div>
+  );
+
+  const Dashboard = () => (
+    <div className="min-h-screen bg-gray-50 pb-12">
+      <div className="bg-yellow-500 pb-24 pt-12 px-4">
+        <div className="max-w-7xl mx-auto flex items-center text-white">
+           <div className="w-16 h-16 bg-white rounded-full text-yellow-500 flex items-center justify-center font-bold text-2xl mr-4 shadow-inner">
+             {user.name.charAt(0)}
+           </div>
+           <div>
+             <h2 className="text-2xl font-bold">{t('welcome')}, {user.name} San!</h2>
+             <p className="opacity-90">ID: {user.id} | 目指そう介護福祉士 Video Class</p>
+           </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-4 -mt-16 grid lg:grid-cols-3 gap-8">
+        {/* Main Content Area */}
+        <div className="lg:col-span-2 space-y-8">
+          {/* Progress Card */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="font-bold text-gray-800 mb-4 flex items-center">
+              <BarChart className="w-5 h-5 mr-2 text-yellow-500" />
+              学習進捗状況
+            </h3>
+            <div className="relative pt-1">
+              <div className="flex mb-2 items-center justify-between">
+                <div>
+                  <span className="text-xs font-semibold inline-block py-1 px-2 uppercase rounded-full text-yellow-600 bg-yellow-200">
+                    進行中
+                  </span>
+                </div>
+                <div className="text-right">
+                  <span className="text-xs font-semibold inline-block text-yellow-600">
+                    {user.progress}%
+                  </span>
+                </div>
+              </div>
+              <div className="overflow-hidden h-2 mb-4 text-xs flex rounded bg-yellow-200">
+                <div style={{ width: `${user.progress}%` }} className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-yellow-500"></div>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500">次回: 第5章「認知症の理解」テストに挑戦しましょう。</p>
+          </div>
+
+          {/* Learning Materials */}
+          <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+            <h3 className="font-bold text-gray-800 mb-4 flex items-center">
+              <Video className="w-5 h-5 mr-2 text-blue-500" />
+              受講コンテンツ
+            </h3>
+            <div className="space-y-4">
+              {[1, 2, 3].map(i => (
+                <div key={i} className="flex items-center p-3 border border-gray-100 rounded-lg hover:bg-gray-50 transition cursor-pointer group">
+                  <div className="w-12 h-12 bg-gray-200 rounded-lg flex items-center justify-center mr-4 group-hover:bg-blue-100">
+                    <PlayCircle className="w-6 h-6 text-gray-500 group-hover:text-blue-600" />
+                  </div>
+                  <div className="flex-grow">
+                    <h4 className="font-bold text-gray-800 text-sm">第{i}回 介護の基本と制度</h4>
+                    <p className="text-xs text-gray-500">動画: 45分 | 資料PDFあり</p>
+                  </div>
+                  <button className="text-xs border border-gray-300 px-3 py-1 rounded text-gray-600 hover:bg-gray-100">視聴する</button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Sidebar */}
+        <div className="space-y-8">
+           {/* Next Booking */}
+           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+             <h3 className="font-bold text-gray-800 mb-4">次回の予約</h3>
+             <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-100 mb-4">
+               <div className="text-yellow-800 font-bold mb-1">2026年 3月 15日 (土)</div>
+               <div className="text-sm text-yellow-700">14:00 - 15:00</div>
+               <div className="text-xs text-yellow-600 mt-2">個別面談 (Zoom)</div>
+             </div>
+             <button onClick={() => setPage('booking')} className="w-full border border-yellow-500 text-yellow-600 py-2 rounded-lg text-sm font-bold hover:bg-yellow-50">
+               新規予約 / 変更
+             </button>
+           </div>
+
+           {/* Support */}
+           <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+             <h3 className="font-bold text-gray-800 mb-4">サポート窓口</h3>
+             <div className="space-y-2">
+               <button className="w-full flex items-center p-2 rounded hover:bg-gray-50 text-sm text-gray-700">
+                 <MessageCircle className="w-4 h-4 mr-2 text-blue-500" /> チャットで質問
+               </button>
+               <button className="w-full flex items-center p-2 rounded hover:bg-gray-50 text-sm text-gray-700">
+                 <CreditCard className="w-4 h-4 mr-2 text-green-500" /> お支払い確認
+               </button>
+               <button className="w-full flex items-center p-2 rounded hover:bg-gray-50 text-sm text-gray-700">
+                 <Settings className="w-4 h-4 mr-2 text-gray-500" /> プロフィール設定
+               </button>
+             </div>
+           </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const AdminPanel = () => (
+    <div className="flex min-h-screen bg-gray-100">
+      {/* Sidebar */}
+      <div className="w-64 bg-gray-900 text-white hidden md:block">
+        <div className="p-6 font-bold text-xl flex items-center">
+          <Sun className="text-yellow-400 mr-2" /> Admin
+        </div>
+        <nav className="mt-6 px-4 space-y-2">
+          <div className="flex items-center p-3 bg-gray-800 rounded-lg text-yellow-400">
+            <BarChart className="w-5 h-5 mr-3" /> ダッシュボード
+          </div>
+          <div className="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg cursor-pointer">
+            <Users className="w-5 h-5 mr-3" /> 受講生管理
+          </div>
+          <div className="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg cursor-pointer">
+            <Calendar className="w-5 h-5 mr-3" /> 予約管理
+            <span className="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">3</span>
+          </div>
+          <div className="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg cursor-pointer">
+            <FileText className="w-5 h-5 mr-3" /> コンテンツ管理
+          </div>
+          <div className="flex items-center p-3 text-gray-400 hover:bg-gray-800 rounded-lg cursor-pointer mt-10" onClick={handleLogout}>
+            <LogOut className="w-5 h-5 mr-3" /> ログアウト
+          </div>
+        </nav>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 p-8 overflow-y-auto">
+        <h1 className="text-2xl font-bold text-gray-800 mb-6">管理者ダッシュボード</h1>
+        
+        {/* KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+             <div className="text-gray-500 text-sm mb-1">今月の売上</div>
+             <div className="text-2xl font-bold">¥1,250,000</div>
+             <div className="text-green-500 text-xs mt-2">↑ 先月比 +12%</div>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+             <div className="text-gray-500 text-sm mb-1">新規受講生</div>
+             <div className="text-2xl font-bold">18名</div>
+             <div className="text-gray-400 text-xs mt-2">累計: 342名</div>
+          </div>
+          <div className="bg-white p-6 rounded-xl shadow-sm">
+             <div className="text-gray-500 text-sm mb-1">未対応の予約</div>
+             <div className="text-2xl font-bold text-red-500">3件</div>
+             <div className="text-gray-400 text-xs mt-2">要確認</div>
+          </div>
+        </div>
+
+        {/* Booking Table */}
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+            <h3 className="font-bold text-gray-800">直近の予約リクエスト</h3>
+            <button className="text-sm text-blue-600 hover:underline">すべて見る</button>
+          </div>
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50 text-gray-500 text-xs uppercase">
+                <th className="px-6 py-3">受講生</th>
+                <th className="px-6 py-3">内容</th>
+                <th className="px-6 py-3">日時</th>
+                <th className="px-6 py-3">ステータス</th>
+                <th className="px-6 py-3">操作</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-100 text-sm">
+              {[
+                { name: "Ma Ma", type: "無料説明会", date: "3/15 10:00", status: "未対応" },
+                { name: "Kyaw Kyaw", type: "個別授業", date: "3/16 14:00", status: "確定" },
+                { name: "Su Su", type: "振替希望", date: "3/18 19:00", status: "未対応" },
+              ].map((row, i) => (
+                <tr key={i} className="hover:bg-gray-50">
+                  <td className="px-6 py-4 font-medium">{row.name}</td>
+                  <td className="px-6 py-4">{row.type}</td>
+                  <td className="px-6 py-4">{row.date}</td>
+                  <td className="px-6 py-4">
+                    <span className={`px-2 py-1 rounded-full text-xs ${row.status === '未対応' ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                      {row.status}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <button className="text-blue-600 hover:text-blue-800 mr-2">詳細</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  const ContactPage = () => (
+    <div className="max-w-2xl mx-auto py-12 px-4">
+      <h2 className="text-3xl font-bold text-center mb-8 text-gray-800">{t('nav_contact')}</h2>
+      
+      <div className="bg-blue-50 border border-blue-200 p-6 rounded-xl mb-10 text-center">
+        <h3 className="font-bold text-blue-800 mb-2">Messengerでのお問い合わせが便利です</h3>
+        <p className="text-sm text-blue-600 mb-4">通常1時間以内に返信いたします（営業時間内）</p>
+        <button className="bg-blue-600 text-white px-6 py-3 rounded-full font-bold shadow-md hover:bg-blue-500 flex items-center justify-center mx-auto">
+          <MessageCircle className="w-5 h-5 mr-2" /> Messengerで送る
+        </button>
+      </div>
+
+      <div className="bg-white p-8 rounded-xl shadow-md border border-gray-100">
+        <h3 className="text-lg font-bold mb-6 border-b pb-2">お問い合わせフォーム</h3>
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">お名前</label>
+            <input className="w-full border border-gray-300 p-2 rounded-md" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">メールアドレス</label>
+            <input className="w-full border border-gray-300 p-2 rounded-md" />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">お問い合わせ内容</label>
+            <textarea className="w-full border border-gray-300 p-2 rounded-md h-32"></textarea>
+          </div>
+          <button className="w-full bg-gray-800 text-white py-3 rounded-md font-bold hover:bg-gray-700">送信する</button>
+        </div>
+      </div>
+    </div>
+  );
+
+  // --- RENDERER ---
+  return (
+    <div className="font-sans text-gray-900 bg-white min-h-screen flex flex-col">
+      {page !== 'admin' && <Navbar />}
+      
+      <main className="flex-grow">
+        {page === 'home' && <Home />}
+        {page === 'courses' && <CoursesPage />}
+        {page === 'booking' && <BookingPage />}
+        {page === 'contact' && <ContactPage />}
+        {page === 'login' && <LoginPage />}
+        {page === 'dashboard' && <Dashboard />}
+        {page === 'admin' && <AdminPanel />}
+      </main>
+
+      {page !== 'admin' && <Footer />}
+    </div>
+  );
+}
