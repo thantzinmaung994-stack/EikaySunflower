@@ -40,15 +40,16 @@ npm run build      # dist/ を生成
 iOS は macOS + Xcode、Android は Android Studio が必要です。
 
 ```bash
-npx cap add ios        # 初回のみ（ios/ が生成される）
-npx cap add android    # 初回のみ（android/ が生成される）
-npm run cap:ios        # build → sync → Xcode を開く
+npm run cap:ios        # build → sync → Xcode を開く（ios/ は作成済み）
+npx cap add android    # Android は初回のみ（android/ が生成される）
 npm run cap:android    # build → sync → Android Studio を開く
 ```
 
+iPhone での試し方（TestFlight）は [docs/iOS_TestFlight手順.md](docs/iOS_TestFlight手順.md) を参照。
+
 - App ID: `com.eikaysunflower.kaigokiroku`（`capacitor.config.ts`）
 - データは `@capacitor/preferences` で端末内に保存（Web では localStorage）。サーバー不要。
-- アイコン・スプラッシュは `npx @capacitor/assets generate` で `assets/` から生成できます。
+- アイコンの元画像は `assets/icon.png`（1024×1024）。iOS のアイコン・起動画面は設定済み。
 
 ## 場面（シナリオ）の追加
 
