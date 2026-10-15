@@ -15,16 +15,28 @@ export async function loadRecords(): Promise<RecordEntry[]> {
 }
 
 export async function saveRecords(records: RecordEntry[]): Promise<void> {
-  await Preferences.set({ key: KEY, value: JSON.stringify(records) });
+  try {
+    await Preferences.set({ key: KEY, value: JSON.stringify(records) });
+  } catch {
+    // 保存できない環境（プライベートブラウズなど）でもアプリは動かし続ける
+  }
 }
 
 export async function loadLang(): Promise<'ja' | 'my'> {
-  const { value } = await Preferences.get({ key: LANG_KEY });
-  return value === 'my' ? 'my' : 'ja';
+  try {
+    const { value } = await Preferences.get({ key: LANG_KEY });
+    return value === 'my' ? 'my' : 'ja';
+  } catch {
+    return 'ja';
+  }
 }
 
 export async function saveLang(lang: 'ja' | 'my'): Promise<void> {
-  await Preferences.set({ key: LANG_KEY, value: lang });
+  try {
+    await Preferences.set({ key: LANG_KEY, value: lang });
+  } catch {
+    // 無視
+  }
 }
 
 export const newId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;

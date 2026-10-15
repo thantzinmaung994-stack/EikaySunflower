@@ -29,6 +29,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
   const [soap, setSoap] = useState<Soap>(EMPTY_SOAP);
   const [result, setResult] = useState<CheckResult | null>(null);
   const [savedId, setSavedId] = useState<string | null>(null);
+  const [error, setError] = useState('');
 
   const steps = useMemo(() => (scenario ? ['scene', 'fields', 'w', 'soap', 'result'] : ['fields', 'w', 'soap', 'result']), [scenario]);
   const [stepIdx, setStepIdx] = useState(0);
@@ -53,9 +54,10 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
 
   const runCheck = () => {
     if (!soap.o.trim()) {
-      alert(t(lang, 'emptySoap'));
+      setError(t(lang, 'emptySoap'));
       return;
     }
+    setError('');
     const entry = buildEntry();
     const r = evaluate(entry, scenario, category);
     setResult(r);
@@ -176,6 +178,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
           {renderSoap('o', 'O')}
           {renderSoap('a', 'A')}
           {renderSoap('p', 'P')}
+          {error && <div className="finding error" role="alert">{error}</div>}
         </div>
       )}
 

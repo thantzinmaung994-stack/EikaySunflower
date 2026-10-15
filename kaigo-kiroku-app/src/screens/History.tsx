@@ -14,6 +14,8 @@ const grade = (s: number) => (s >= 80 ? 'good' : s >= 50 ? 'mid' : 'low');
 
 export function History({ lang, records, onDelete }: Props) {
   const [openId, setOpenId] = useState<string | null>(null);
+  // ブラウザの confirm() は WebView や埋め込み表示で使えないことがあるので、2回タップで削除する
+  const [confirmId, setConfirmId] = useState<string | null>(null);
   if (records.length === 0) return <div className="empty">{t(lang, 'noRecords')}</div>;
 
   return (
@@ -48,13 +50,19 @@ export function History({ lang, records, onDelete }: Props) {
                   <dt>A</dt><dd>{r.soap.a || '—'}</dd>
                   <dt>P</dt><dd>{r.soap.p || '—'}</dd>
                 </dl>
-                <button
-                  className="btn ghost small"
-                  style={{ marginTop: 8, color: 'var(--error)' }}
-                  onClick={() => { if (confirm(t(lang, 'confirmDelete'))) onDelete(r.id); }}
-                >
-                  🗑 {t(lang, 'delete')}
-                </button>
+                {confirmId === r.id ? (
+                  <div className="row" style={{ marginTop: 8 }}>
+                    <button className="btn ghost small" onClick={() => setConfirmId(null)}>{t(lang, 'back')}</button>
+                    <button className="btn small" style={{ background: 'var(--error)' }} onClick={() => { onDelete(r.id); setConfirmId(null); }}>
+                      🗑 {t(lang, 'delete')}
+                    </button>
+                  </div>
+                ) : (
+                  <button className="btn ghost small" style={{ marginTop: 8, color: 'var(--error)' }} onClick={() => setConfirmId(r.id)}>
+                    🗑 {t(lang, 'delete')}
+                  </button>
+                )}
+                {confirmId === r.id && <div className="muted" style={{ marginTop: 4 }}>{t(lang, 'confirmDelete')}</div>}
               </div>
             )}
           </div>
