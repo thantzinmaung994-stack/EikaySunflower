@@ -2,6 +2,7 @@ import { CATEGORIES } from '../data/categories';
 import { SCENARIOS } from '../data/scenarios';
 import { t } from '../i18n';
 import type { CategoryId, Lang, RecordEntry } from '../types';
+import logoFull from '../assets/logo-full.png';
 
 interface Props {
   lang: Lang;
@@ -16,11 +17,14 @@ export function Home({ lang, records, onPractice, onFree }: Props) {
   const scored = records.filter((r) => r.score !== undefined).slice(0, 5);
   return (
     <>
+      <div className="brand">
+        <img src={logoFull} alt="EIKAY SUNFLOWER Education & Learning" />
+      </div>
       <div className="card hero">
         <h1>{t(lang, 'heroTitle')}</h1>
         <p>{t(lang, 'heroSub')}</p>
         <button className="btn" onClick={onPractice}>📖 {t(lang, 'startPractice')}</button>
-        <button className="btn secondary" style={{ marginTop: 8, background: '#fff' }} onClick={() => onFree()}>✏️ {t(lang, 'freeRecord')}</button>
+        <button className="btn secondary" style={{ marginTop: 8 }} onClick={() => onFree()}>✏️ {t(lang, 'freeRecord')}</button>
         <div className="muted" style={{ marginTop: 8 }}>{SCENARIOS.length} {t(lang, 'scenarioCount')}</div>
       </div>
 

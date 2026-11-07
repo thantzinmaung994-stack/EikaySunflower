@@ -8,6 +8,7 @@ import { Learn } from './screens/Learn';
 import { PracticeList } from './screens/PracticeList';
 import { RecordEditor } from './screens/RecordEditor';
 import type { CategoryId, Lang, RecordEntry } from './types';
+import logoMark from './assets/logo-mark.png';
 
 type Tab = 'home' | 'practice' | 'free' | 'history' | 'learn';
 type View = { kind: 'tab'; tab: Tab } | { kind: 'scenario'; id: string } | { kind: 'free'; cat?: CategoryId };
@@ -89,7 +90,7 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div className="title">
-          <span className="sun">🌻</span>
+          <img className="logo" src={logoMark} alt="EikaySunflower" />
           <span>{t(lang, 'appName')}</span>
         </div>
         <button className="lang-toggle" onClick={toggleLang} aria-label={t(lang, 'language')}>
