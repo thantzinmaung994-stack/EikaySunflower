@@ -63,3 +63,14 @@ describe('overlapping words', () => {
     expect(f.filter((x) => x.severity === 'error').map((x) => x.match)).toEqual(['のだと思']);
   });
 });
+
+describe('quoted resident words', () => {
+  it('does not flag guess words inside 「」 in S', () => {
+    const f = checkSoap({ s: '「あの人が盗ったんでしょう」', o: '10:00 居室で「財布がない」と話した。', a: '不安が強い可能性がある', p: '一緒に探し、看護師に報告する' });
+    expect(f.some((x) => x.part === 'S' && x.code === 'speculation')).toBe(false);
+  });
+  it('still flags staff guesses written in S outside quotes', () => {
+    const f = checkSoap({ s: '盗られたと思っているようだ', o: '10:00 居室で「財布がない」と話した。', a: '可能性がある', p: '観察する' });
+    expect(f.some((x) => x.part === 'S' && x.code === 'speculation')).toBe(true);
+  });
+});

@@ -102,7 +102,7 @@ export function checkSoap(soap: Soap, category?: CategoryDef): Finding[] {
   for (const w of findAll(stripQuotes(soap.o), FEELINGS)) {
     f.push({ code: 'feeling', severity: 'error', part: 'O', match: w, message: `「${w}」は職員の感情です。記録には利用者の様子を書き、職員の気持ちは書きません。` });
   }
-  for (const w of findAll(soap.s, SPECULATION)) {
+  for (const w of findAll(stripQuotes(soap.s), SPECULATION)) {
     f.push({ code: 'speculation', severity: 'warn', part: 'S', match: w, message: `S は本人の言葉をそのまま書く欄です。「${w}」のような職員の推測は A へ。` });
   }
   for (const { word, hint } of VAGUE) {
