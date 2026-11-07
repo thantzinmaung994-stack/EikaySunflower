@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { FieldInput } from '../components/FieldInput';
+import { Ruby } from '../components/Ruby';
 import { ResultPanel } from '../components/ResultPanel';
 import { CATEGORIES, categoryById } from '../data/categories';
 import { t } from '../i18n';
@@ -100,18 +101,18 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
           {scenario ? t(lang, 'mode_scenario') : t(lang, 'mode_free')} ・ {category.icon} {lang === 'my' ? category.nameMy : category.name}
           {scenario && <> ・ <span className={`badge lv${scenario.level}`}>Lv.{scenario.level}</span></>}
         </div>
-        {scenario && <h2 style={{ marginTop: 4 }}>{scenario.title}</h2>}
+        {scenario && <h2 style={{ marginTop: 4 }}><Ruby text={scenario.title} /></h2>}
       </div>
 
       {step === 'scene' && scenario && (
         <div className="card">
           <h2>{t(lang, 'scene')}</h2>
           <div className="muted" style={{ marginBottom: 6 }}>{t(lang, 'resident')}: {scenario.resident}</div>
-          <div className="story">{scenario.story}</div>
+          <div className="story"><Ruby text={scenario.story} /></div>
           {lang === 'my' && scenario.storyMy && <div className="story-my">{scenario.storyMy}</div>}
           <h3>{t(lang, 'tips')}</h3>
           <ul className="tips">
-            {category.tips.map((x) => <li key={x}>{x}</li>)}
+            {category.tips.map((x) => <li key={x}><Ruby text={x} /></li>)}
           </ul>
         </div>
       )}
@@ -142,7 +143,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
           </div>
           <h3>{t(lang, 'tips')}</h3>
           <ul className="tips">
-            {category.tips.map((x) => <li key={x}>{x}</li>)}
+            {category.tips.map((x) => <li key={x}><Ruby text={x} /></li>)}
           </ul>
         </div>
       )}
@@ -153,7 +154,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
           {scenario && (
             <details style={{ marginBottom: 8 }}>
               <summary>{t(lang, 'readScene')}</summary>
-              <div className="story">{scenario.story}</div>
+              <div className="story"><Ruby text={scenario.story} /></div>
             </details>
           )}
           {(['when', 'where', 'who', 'what', 'why', 'how'] as const).map((k) => (
@@ -171,7 +172,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
           {scenario && (
             <details style={{ marginBottom: 8 }}>
               <summary>{t(lang, 'readScene')}</summary>
-              <div className="story">{scenario.story}</div>
+              <div className="story"><Ruby text={scenario.story} /></div>
             </details>
           )}
           {renderSoap('s', 'S')}

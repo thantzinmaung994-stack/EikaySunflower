@@ -100,10 +100,26 @@ export interface RecordEntry {
 export type Severity = 'good' | 'info' | 'warn' | 'error';
 
 export interface Finding {
+  /** 指摘の種類（苦手分析の集計に使う） */
+  code?: FindingCode;
   severity: Severity;
   part: string;
   message: string;
   /** 該当した語句 */
   match?: string;
   suggestion?: string;
+}
+
+export type FindingCode =
+  | 'speculation' | 'feeling' | 'vague' | 'label'
+  | 's-empty' | 's-quote' | 'time' | 'number' | 'short' | 'report' | 'a' | 'p' | 'good';
+
+/** ミニクイズ1回分の結果 */
+export interface QuizResult {
+  id: string;
+  createdAt: string;
+  total: number;
+  correct: number;
+  askedIds: string[];
+  wrongIds: string[];
 }

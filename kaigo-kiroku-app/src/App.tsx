@@ -1,36 +1,55 @@
 import { useEffect, useState } from 'react';
+import { INFO_PAGES, type InfoPage } from './data/info';
 import { scenarioById } from './data/scenarios';
 import { t } from './i18n';
-import { loadLang, loadRecords, saveLang, saveRecords } from './lib/storage';
+import { DEFAULT_SETTINGS, loadSettings, saveSettings, SettingsContext, type Settings } from './lib/settings';
+import { clearAll, loadJson, loadLang, loadRecords, saveJson, saveRecords } from './lib/storage';
+import { FactQuiz } from './screens/FactQuiz';
 import { History } from './screens/History';
 import { Home } from './screens/Home';
 import { Learn } from './screens/Learn';
 import { PracticeList } from './screens/PracticeList';
 import { RecordEditor } from './screens/RecordEditor';
-import type { CategoryId, Lang, RecordEntry } from './types';
+import { InfoView, SettingsScreen } from './screens/SettingsScreen';
+import type { CategoryId, QuizResult, RecordEntry } from './types';
 import logoMark from './assets/logo-mark.png';
 
-type Tab = 'home' | 'practice' | 'free' | 'history' | 'learn';
-type View = { kind: 'tab'; tab: Tab } | { kind: 'scenario'; id: string } | { kind: 'free'; cat?: CategoryId };
+type Tab = 'home' | 'practice' | 'quiz' | 'history' | 'learn';
+type View =
+  | { kind: 'tab'; tab: Tab }
+  | { kind: 'scenario'; id: string }
+  | { kind: 'free'; cat?: CategoryId }
+  | { kind: 'settings' }
+  | { kind: 'info'; id: InfoPage['id'] };
+
+const QUIZ_KEY = 'kaigo-kiroku:quizzes';
 
 export default function App() {
-  const [lang, setLang] = useState<Lang>('ja');
+  const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [records, setRecords] = useState<RecordEntry[]>([]);
+  const [quizzes, setQuizzes] = useState<QuizResult[]>([]);
   const [view, setView] = useState<View>({ kind: 'tab', tab: 'home' });
   const [loaded, setLoaded] = useState(false);
+  const lang = settings.lang;
 
   useEffect(() => {
-    Promise.all([loadRecords(), loadLang()]).then(([r, l]) => {
+    (async () => {
+      const [r, q, s] = await Promise.all([loadRecords(), loadJson<QuizResult[]>(QUIZ_KEY, []), loadLang().then(loadSettings)]);
       setRecords(r);
-      setLang(l);
+      setQuizzes(q);
+      setSettings(s);
       setLoaded(true);
-    });
+    })();
   }, []);
 
-  const toggleLang = () => {
-    const next: Lang = lang === 'ja' ? 'my' : 'ja';
-    setLang(next);
-    void saveLang(next);
+  const go = (v: View) => {
+    setView(v);
+    window.scrollTo(0, 0);
+  };
+
+  const updateSettings = (s: Settings) => {
+    setSettings(s);
+    void saveSettings(s);
   };
 
   const upsert = (entry: RecordEntry) => {
@@ -49,18 +68,29 @@ export default function App() {
     });
   };
 
-  const goTab = (tab: Tab) => {
-    if (tab === 'free') setView({ kind: 'free' });
-    else setView({ kind: 'tab', tab });
-    window.scrollTo(0, 0);
+  const addQuiz = (q: QuizResult) => {
+    setQuizzes((prev) => {
+      const next = [q, ...prev].slice(0, 200);
+      void saveJson(QUIZ_KEY, next);
+      return next;
+    });
   };
 
-  const activeTab: Tab = view.kind === 'tab' ? view.tab : view.kind === 'scenario' ? 'practice' : 'free';
+  const clearData = async () => {
+    await clearAll();
+    setRecords([]);
+    setQuizzes([]);
+    // 設定は消さずに残す（言語が急に変わると困るため）
+    void saveSettings(settings);
+  };
 
-  const tabs: { id: Tab; ico: string; key: 'tabHome' | 'tabPractice' | 'tabFree' | 'tabHistory' | 'tabLearn' }[] = [
+  const activeTab: Tab | null =
+    view.kind === 'tab' ? view.tab : view.kind === 'scenario' || view.kind === 'free' ? 'practice' : null;
+
+  const tabs: { id: Tab; ico: string; key: 'tabHome' | 'tabPractice' | 'tabQuiz' | 'tabHistory' | 'tabLearn' }[] = [
     { id: 'home', ico: '🏠', key: 'tabHome' },
-    { id: 'practice', ico: '📖', key: 'tabPractice' },
-    { id: 'free', ico: '✏️', key: 'tabFree' },
+    { id: 'practice', ico: '📝', key: 'tabPractice' },
+    { id: 'quiz', ico: '⚡', key: 'tabQuiz' },
     { id: 'history', ico: '🗂', key: 'tabHistory' },
     { id: 'learn', ico: '🎓', key: 'tabLearn' },
   ];
@@ -68,18 +98,31 @@ export default function App() {
   let body: JSX.Element | null = null;
   if (!loaded) body = null;
   else if (view.kind === 'scenario') {
-    const sc = scenarioById(view.id);
-    body = (
-      <RecordEditor key={view.id} lang={lang} scenario={sc} onSave={upsert} onExit={() => goTab('history')} />
-    );
+    body = <RecordEditor key={view.id} lang={lang} scenario={scenarioById(view.id)} onSave={upsert} onExit={() => go({ kind: 'tab', tab: 'history' })} />;
   } else if (view.kind === 'free') {
-    body = (
-      <RecordEditor key={`free-${view.cat ?? ''}`} lang={lang} initialCategory={view.cat} onSave={upsert} onExit={() => goTab('history')} />
-    );
+    body = <RecordEditor key={`free-${view.cat ?? ''}`} lang={lang} initialCategory={view.cat} onSave={upsert} onExit={() => go({ kind: 'tab', tab: 'history' })} />;
+  } else if (view.kind === 'settings') {
+    body = <SettingsScreen settings={settings} onChange={updateSettings} onOpenInfo={(id) => go({ kind: 'info', id })} onClearData={clearData} />;
+  } else if (view.kind === 'info') {
+    const page = INFO_PAGES.find((p) => p.id === view.id)!;
+    body = <InfoView page={page} onBack={() => go({ kind: 'settings' })} backLabel={t(lang, 'back')} />;
   } else if (view.tab === 'home') {
-    body = <Home lang={lang} records={records} onPractice={() => goTab('practice')} onFree={(cat) => setView({ kind: 'free', cat })} />;
+    body = (
+      <Home
+        lang={lang}
+        records={records}
+        quizzes={quizzes}
+        dailyGoal={settings.dailyGoal}
+        onScenario={(id) => go({ kind: 'scenario', id })}
+        onQuiz={() => go({ kind: 'tab', tab: 'quiz' })}
+        onFree={(cat) => go({ kind: 'free', cat })}
+        onPractice={() => go({ kind: 'tab', tab: 'practice' })}
+      />
+    );
   } else if (view.tab === 'practice') {
-    body = <PracticeList lang={lang} records={records} onSelect={(id) => { setView({ kind: 'scenario', id }); window.scrollTo(0, 0); }} />;
+    body = <PracticeList lang={lang} records={records} onSelect={(id) => go({ kind: 'scenario', id })} onFree={() => go({ kind: 'free' })} />;
+  } else if (view.tab === 'quiz') {
+    body = <FactQuiz lang={lang} quizzes={quizzes} onFinish={addQuiz} />;
   } else if (view.tab === 'history') {
     body = <History lang={lang} records={records} onDelete={remove} />;
   } else {
@@ -87,25 +130,32 @@ export default function App() {
   }
 
   return (
-    <div className="app">
-      <header className="header">
-        <div className="title">
-          <img className="logo" src={logoMark} alt="EikaySunflower" />
-          <span>{t(lang, 'appName')}</span>
-        </div>
-        <button className="lang-toggle" onClick={toggleLang} aria-label={t(lang, 'language')}>
-          {lang === 'ja' ? 'မြန်မာ' : '日本語'}
-        </button>
-      </header>
-      <main className="main">{body}</main>
-      <nav className="tabbar">
-        {tabs.map((tb) => (
-          <button key={tb.id} className={activeTab === tb.id ? 'active' : ''} onClick={() => goTab(tb.id)}>
-            <span className="ico">{tb.ico}</span>
-            {t(lang, tb.key)}
+    <SettingsContext.Provider value={settings}>
+      <div className="app">
+        <header className="header">
+          <button className="title" onClick={() => go({ kind: 'tab', tab: 'home' })}>
+            <img className="logo" src={logoMark} alt="EikaySunflower" />
+            <span>{t(lang, 'appName')}</span>
           </button>
-        ))}
-      </nav>
-    </div>
+          <div className="header-actions">
+            <button className="lang-toggle" onClick={() => updateSettings({ ...settings, lang: lang === 'ja' ? 'my' : 'ja' })} aria-label={t(lang, 'language')}>
+              {lang === 'ja' ? 'မြန်မာ' : '日本語'}
+            </button>
+            <button className={`icon-btn${view.kind === 'settings' || view.kind === 'info' ? ' on' : ''}`} onClick={() => go({ kind: 'settings' })} aria-label={t(lang, 'settings')}>
+              ⚙️
+            </button>
+          </div>
+        </header>
+        <main className="main">{body}</main>
+        <nav className="tabbar">
+          {tabs.map((tb) => (
+            <button key={tb.id} className={activeTab === tb.id ? 'active' : ''} onClick={() => go({ kind: 'tab', tab: tb.id })}>
+              <span className="ico">{tb.ico}</span>
+              {t(lang, tb.key)}
+            </button>
+          ))}
+        </nav>
+      </div>
+    </SettingsContext.Provider>
   );
 }

@@ -5,22 +5,25 @@ const KEY = 'kaigo-kiroku:records';
 const LANG_KEY = 'kaigo-kiroku:lang';
 
 // ブラウザ上では Preferences が localStorage を使うので、Web でもそのまま動く
-export async function loadRecords(): Promise<RecordEntry[]> {
+export async function loadJson<T>(key: string, fallback: T): Promise<T> {
   try {
-    const { value } = await Preferences.get({ key: KEY });
-    return value ? (JSON.parse(value) as RecordEntry[]) : [];
+    const { value } = await Preferences.get({ key });
+    return value ? (JSON.parse(value) as T) : fallback;
   } catch {
-    return [];
+    return fallback;
   }
 }
 
-export async function saveRecords(records: RecordEntry[]): Promise<void> {
+export async function saveJson(key: string, value: unknown): Promise<void> {
   try {
-    await Preferences.set({ key: KEY, value: JSON.stringify(records) });
+    await Preferences.set({ key, value: JSON.stringify(value) });
   } catch {
     // 保存できない環境（プライベートブラウズなど）でもアプリは動かし続ける
   }
 }
+
+export const loadRecords = () => loadJson<RecordEntry[]>(KEY, []);
+export const saveRecords = (records: RecordEntry[]) => saveJson(KEY, records);
 
 export async function loadLang(): Promise<'ja' | 'my'> {
   try {
@@ -34,6 +37,16 @@ export async function loadLang(): Promise<'ja' | 'my'> {
 export async function saveLang(lang: 'ja' | 'my'): Promise<void> {
   try {
     await Preferences.set({ key: LANG_KEY, value: lang });
+  } catch {
+    // 無視
+  }
+}
+
+/** すべての学習データを消す（設定画面の「データを消去」） */
+export async function clearAll(): Promise<void> {
+  try {
+    const { keys } = await Preferences.keys();
+    await Promise.all(keys.filter((k) => k.startsWith('kaigo-kiroku:')).map((key) => Preferences.remove({ key })));
   } catch {
     // 無視
   }

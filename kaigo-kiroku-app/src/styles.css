@@ -148,3 +148,68 @@ details summary { cursor: pointer; font-weight: 700; padding: 6px 0; }
 .field input:focus, .field select:focus, .field textarea:focus, .btn:focus-visible, button:focus-visible { outline: 2px solid var(--gold-deep); outline-offset: 1px; }
 .score-big .num.mid, .score-pill.mid { color: var(--warn); }
 .soap-letter.O { background: #0f766e; } .soap-letter.A { background: var(--navy); } .soap-letter.P { background: var(--gold-text); }
+
+/* ---- ヘッダー ---- */
+.header .title { border: 0; background: none; padding: 0; text-align: left; cursor: pointer; }
+.header-actions { display: flex; align-items: center; gap: 6px; flex: none; }
+.icon-btn { border: 1px solid var(--line); background: #fff; border-radius: 999px; width: 34px; height: 34px; font-size: 16px; line-height: 1; }
+.icon-btn.on { border-color: var(--gold); background: var(--gold-soft); }
+
+/* ---- ふりがな ---- */
+ruby rt { font-size: 0.55em; color: var(--muted); font-weight: 400; letter-spacing: 0; }
+.story, .lesson-body, .model dd, .term-meaning, .term-example, .quiz-q, .finding, .example, .check-list li { line-height: 2.05; }
+
+/* ---- ホーム ---- */
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .08em; color: var(--gold-text); margin-bottom: 4px; }
+.streak { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.streak-num { font-size: 34px; font-weight: 900; color: var(--gold-light); line-height: 1; font-variant-numeric: tabular-nums; }
+.streak-num small { font-size: 14px; font-weight: 700; color: #fff; margin-left: 4px; }
+.week { display: flex; gap: 4px; }
+.week .day { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(255,255,255,.35); display: flex; align-items: center; justify-content: center; font-size: 11px; color: #c9d3e3; }
+.week .day.done { background: var(--gold); border-color: var(--gold); color: var(--navy); font-weight: 800; }
+.week .day.today { outline: 2px solid #fff; outline-offset: 1px; }
+.goal { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.goal-item { flex: 1; min-width: 120px; border: 1px solid rgba(255,255,255,.35); border-radius: 10px; padding: 6px 10px; font-size: 14px; font-weight: 700; color: #fff; }
+.goal-item.ok { background: rgba(221,183,75,.2); border-color: var(--gold); color: var(--gold-light); }
+.list-item.plain { border: 0; padding: 4px 0 10px; margin: 0; }
+.list-item .go { font-size: 22px; color: var(--gold-deep); }
+.overall { display: flex; align-items: center; gap: 10px; font-weight: 800; color: var(--navy); margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+.bar { flex: 1; height: 10px; border-radius: 999px; background: var(--navy-soft); overflow: hidden; display: block; }
+.bar > div, .bar > span { display: block; height: 100%; background: linear-gradient(90deg, var(--gold-deep), var(--gold)); border-radius: 999px; }
+.bar.small { height: 6px; }
+.cat-progress { display: grid; gap: 4px; }
+.cat-row { display: grid; grid-template-columns: 24px minmax(0, 1fr) 70px 34px; align-items: center; gap: 8px; border: 0; background: none; padding: 4px 0; text-align: left; font-size: 13px; }
+.cat-row .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cat-row .count { text-align: right; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* ---- クイズ ---- */
+.quiz-q { font-size: 18px; font-weight: 700; color: var(--navy); margin: 8px 0 12px; }
+.quiz-btn { background: #fff; color: var(--navy); border: 2px solid var(--navy); font-size: 16px; padding: 14px 8px; }
+.quiz-btn:disabled { opacity: 1; }
+.quiz-btn.right { background: var(--good); border-color: var(--good); color: #fff; }
+.quiz-btn.chosen-wrong { background: #fdecec; border-color: var(--error); color: var(--error); }
+
+/* ---- 用語辞典 ---- */
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 10px; font-size: 12px; color: var(--text); }
+.chip.active { background: var(--navy); border-color: var(--navy); color: #fff; }
+.term { padding: 12px 14px; }
+.term-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+.term-word { font-size: 18px; color: var(--navy); }
+.term-yomi { color: var(--gold-text); font-size: 14px; font-weight: 700; }
+.term-my { font-size: 14px; color: #374151; margin-top: 2px; }
+.term-meaning { font-size: 14px; margin-top: 4px; }
+.term-example { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* ---- 設定 ---- */
+.setting-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--line); flex-wrap: wrap; }
+.setting-row:last-child { border-bottom: 0; }
+.setting-row input[type=time] { border: 1px solid #e5e7eb; border-radius: 10px; padding: 6px 10px; background: #fff; }
+.seg { display: inline-flex; border: 1px solid var(--navy); border-radius: 10px; overflow: hidden; }
+.seg button { border: 0; background: #fff; color: var(--navy); padding: 6px 12px; font-size: 14px; font-weight: 700; }
+.seg button + button { border-left: 1px solid var(--navy); }
+.seg button.on { background: var(--navy); color: #fff; }
+.seg.wide { display: flex; }
+.seg.wide button { flex: 1; padding: 10px 6px; }
+.info-page h3 { color: var(--navy); }
+.info-page p { margin: 4px 0 8px; font-size: 14px; }

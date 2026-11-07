@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { CheckResult } from '../lib/checker';
 import type { Lang, Scenario } from '../types';
 import { t } from '../i18n';
+import { Ruby } from './Ruby';
 
 interface Props {
   result: CheckResult;
@@ -65,7 +66,7 @@ export function ResultPanel({ result, scenario, lang }: Props) {
                 <span className={`mark ${k.hit ? 'ok' : 'ng'}`}>{k.hit ? '○' : '×'}</span>
                 <div>
                   {k.part && <span className={`soap-letter ${k.part}`} style={{ width: 20, height: 20, fontSize: 12, marginRight: 6 }}>{k.part}</span>}
-                  {k.label}
+                  <Ruby text={k.label} />
                 </div>
               </li>
             ))}
@@ -81,12 +82,12 @@ export function ResultPanel({ result, scenario, lang }: Props) {
             <div>
               {f.match ? (
                 <>
-                  <mark>{f.match}</mark> {f.message.replace(`「${f.match}」`, '')}
+                  <mark>{f.match}</mark> <Ruby text={f.message.replace(`「${f.match}」`, '')} />
                 </>
               ) : (
-                f.message
+                <Ruby text={f.message} />
               )}
-              {f.suggestion && <span className="sug">→ {f.suggestion}</span>}
+              {f.suggestion && <span className="sug">→ <Ruby text={f.suggestion} /></span>}
             </div>
           </div>
         ))}
@@ -101,22 +102,22 @@ export function ResultPanel({ result, scenario, lang }: Props) {
             <>
               <h3>5W1H</h3>
               <dl className="model">
-                <dt>When</dt><dd>{scenario.model.w.when}</dd>
-                <dt>Where</dt><dd>{scenario.model.w.where}</dd>
-                <dt>Who</dt><dd>{scenario.model.w.who}</dd>
-                <dt>What</dt><dd>{scenario.model.w.what}</dd>
-                <dt>Why</dt><dd>{scenario.model.w.why}</dd>
-                <dt>How</dt><dd>{scenario.model.w.how}</dd>
+                <dt>When</dt><dd><Ruby text={scenario.model.w.when} /></dd>
+                <dt>Where</dt><dd><Ruby text={scenario.model.w.where} /></dd>
+                <dt>Who</dt><dd><Ruby text={scenario.model.w.who} /></dd>
+                <dt>What</dt><dd><Ruby text={scenario.model.w.what} /></dd>
+                <dt>Why</dt><dd><Ruby text={scenario.model.w.why} /></dd>
+                <dt>How</dt><dd><Ruby text={scenario.model.w.how} /></dd>
               </dl>
               <h3>SOAP</h3>
               <dl className="model">
-                <dt>S</dt><dd>{scenario.model.soap.s}</dd>
-                <dt>O</dt><dd>{scenario.model.soap.o}</dd>
-                <dt>A</dt><dd>{scenario.model.soap.a}</dd>
-                <dt>P</dt><dd>{scenario.model.soap.p}</dd>
+                <dt>S</dt><dd><Ruby text={scenario.model.soap.s} /></dd>
+                <dt>O</dt><dd><Ruby text={scenario.model.soap.o} /></dd>
+                <dt>A</dt><dd><Ruby text={scenario.model.soap.a} /></dd>
+                <dt>P</dt><dd><Ruby text={scenario.model.soap.p} /></dd>
               </dl>
               <h3>{t(lang, 'explanation')}</h3>
-              <p style={{ fontSize: 14, margin: 0 }}>{scenario.explanation}</p>
+              <p style={{ fontSize: 14, margin: 0 }}><Ruby text={scenario.explanation} /></p>
             </>
           )}
         </div>

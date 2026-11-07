@@ -97,70 +97,70 @@ export function checkSoap(soap: Soap, category?: CategoryDef): Finding[] {
 
   // --- O: 事実と推測の区別 ---
   for (const w of findAll(stripQuotes(soap.o), SPECULATION)) {
-    f.push({ severity: 'error', part: 'O', match: w, message: `「${w}」は推測です。O（客観的情報）には見たこと・聞いたこと・測った数字だけを書き、推測は A に「〜の可能性がある」と書きましょう。` });
+    f.push({ code: 'speculation', severity: 'error', part: 'O', match: w, message: `「${w}」は推測です。O（客観的情報）には見たこと・聞いたこと・測った数字だけを書き、推測は A に「〜の可能性がある」と書きましょう。` });
   }
   for (const w of findAll(stripQuotes(soap.o), FEELINGS)) {
-    f.push({ severity: 'error', part: 'O', match: w, message: `「${w}」は職員の感情です。記録には利用者の様子を書き、職員の気持ちは書きません。` });
+    f.push({ code: 'feeling', severity: 'error', part: 'O', match: w, message: `「${w}」は職員の感情です。記録には利用者の様子を書き、職員の気持ちは書きません。` });
   }
   for (const w of findAll(soap.s, SPECULATION)) {
-    f.push({ severity: 'warn', part: 'S', match: w, message: `S は本人の言葉をそのまま書く欄です。「${w}」のような職員の推測は A へ。` });
+    f.push({ code: 'speculation', severity: 'warn', part: 'S', match: w, message: `S は本人の言葉をそのまま書く欄です。「${w}」のような職員の推測は A へ。` });
   }
   for (const { word, hint } of VAGUE) {
     if (toHalf(soap.o).includes(word)) {
-      f.push({ severity: 'warn', part: 'O', match: word, message: `「${word}」はあいまいな表現です。`, suggestion: hint });
+      f.push({ code: 'vague', severity: 'warn', part: 'O', match: word, message: `「${word}」はあいまいな表現です。`, suggestion: hint });
     }
   }
   for (const { word, hint } of LABELS) {
     const where = (['s', 'o', 'a', 'p'] as const).find((k) => toHalf(soap[k]).includes(word));
     if (where) {
-      f.push({ severity: 'error', part: where.toUpperCase(), match: word, message: `「${word}」は利用者の尊厳を傷つける・ラベルを貼る表現です。`, suggestion: hint });
+      f.push({ code: 'label', severity: 'error', part: where.toUpperCase(), match: word, message: `「${word}」は利用者の尊厳を傷つける・ラベルを貼る表現です。`, suggestion: hint });
     }
   }
 
   // --- S: 本人の言葉 ---
   const sTrim = soap.s.trim();
   if (!sTrim) {
-    f.push({ severity: 'info', part: 'S', message: '本人の言葉がない場合は「（発語なし）」「（特になし）」と書くと、空欄との区別ができます。' });
+    f.push({ code: 's-empty', severity: 'info', part: 'S', message: '本人の言葉がない場合は「（発語なし）」「（特になし）」と書くと、空欄との区別ができます。' });
   } else if (!/[「『"“]/.test(sTrim) && !sTrim.startsWith('（')) {
-    f.push({ severity: 'warn', part: 'S', message: '本人の言葉は「」で囲んで、言ったとおりに書きましょう（例：「体がだるいわ」）。' });
+    f.push({ code: 's-quote', severity: 'warn', part: 'S', message: '本人の言葉は「」で囲んで、言ったとおりに書きましょう（例：「体がだるいわ」）。' });
   }
   if (/[「『]/.test(soap.o) === false && /と言った|と話した|と訴え/.test(soap.o)) {
-    f.push({ severity: 'info', part: 'O', message: '本人の言葉を O に書くときも「」で囲みましょう。' });
+    f.push({ code: 's-quote', severity: 'info', part: 'O', message: '本人の言葉を O に書くときも「」で囲みましょう。' });
   }
 
   // --- O: 5W1H の要素 ---
   if (!TIME_RE.test(toHalf(soap.o))) {
-    f.push({ severity: 'warn', part: 'O', message: 'いつ（時刻）が書かれていません。「7:30」「12時40分」のように書きましょう。' });
+    f.push({ code: 'time', severity: 'warn', part: 'O', message: 'いつ（時刻）が書かれていません。「7:30」「12時40分」のように書きましょう。' });
   }
   if (!/\d/.test(toHalf(soap.o))) {
-    f.push({ severity: 'warn', part: 'O', message: '数字がありません。量・回数・時間・測定値など、数字で書けるものは数字で。' });
+    f.push({ code: 'number', severity: 'warn', part: 'O', message: '数字がありません。量・回数・時間・測定値など、数字で書けるものは数字で。' });
   }
   if (soap.o.trim().length < 20) {
-    f.push({ severity: 'warn', part: 'O', message: 'O が短すぎます。いつ・どこで・誰が・何を・どのように、を順番に書きましょう。' });
+    f.push({ code: 'short', severity: 'warn', part: 'O', message: 'O が短すぎます。いつ・どこで・誰が・何を・どのように、を順番に書きましょう。' });
   }
   if (category?.id === 'incident' && !includesAny(all, ['報告'])) {
-    f.push({ severity: 'warn', part: 'O', message: '事故・ヒヤリハットは「誰に報告したか」を必ず書きます。' });
+    f.push({ code: 'report', severity: 'warn', part: 'O', message: '事故・ヒヤリハットは「誰に報告したか」を必ず書きます。' });
   }
   if (category && ['vital', 'bath', 'incident', 'medication'].includes(category.id) && !includesAny(all, ['看護師', 'リーダー', '医師', '報告'])) {
-    f.push({ severity: 'info', part: 'O', message: 'いつもと違うことがあったときは、誰に報告したかを書きましょう。' });
+    f.push({ code: 'report', severity: 'info', part: 'O', message: 'いつもと違うことがあったときは、誰に報告したかを書きましょう。' });
   }
 
   // --- A ---
   if (!soap.a.trim()) {
-    f.push({ severity: 'warn', part: 'A', message: 'A（アセスメント）が空です。O の事実から考えられることを「〜の可能性がある」「〜と考えられる」と書きましょう。' });
+    f.push({ code: 'a', severity: 'warn', part: 'A', message: 'A（アセスメント）が空です。O の事実から考えられることを「〜の可能性がある」「〜と考えられる」と書きましょう。' });
   } else if (!includesAny(soap.a, ['可能性', '考えられ', '思われ', 'おそれ', '危険', 'リスク', '必要', 'ない', 'なし', '問題', '疑'])) {
-    f.push({ severity: 'info', part: 'A', message: 'A は職員の専門的な判断です。「〜の可能性がある」「〜と考えられる」のように、O の事実をもとにした判断として書きましょう。' });
+    f.push({ code: 'a', severity: 'info', part: 'A', message: 'A は職員の専門的な判断です。「〜の可能性がある」「〜と考えられる」のように、O の事実をもとにした判断として書きましょう。' });
   }
 
   // --- P ---
   if (!soap.p.trim()) {
-    f.push({ severity: 'warn', part: 'P', message: 'P（計画）が空です。次に何をするか、「〜する」「〜を観察する」「〜に報告する」と書きましょう。' });
+    f.push({ code: 'p', severity: 'warn', part: 'P', message: 'P（計画）が空です。次に何をするか、「〜する」「〜を観察する」「〜に報告する」と書きましょう。' });
   } else if (!includesAny(soap.p, ['する', 'します', '行う', '観察', '報告', '相談', '確認', '続け', '継続', 'ください', '徹底', '共有', 'お願い'])) {
-    f.push({ severity: 'info', part: 'P', message: 'P は行動で書きます。「〜する」「〜を観察する」「〜に報告する」のように。' });
+    f.push({ code: 'p', severity: 'info', part: 'P', message: 'P は行動で書きます。「〜する」「〜を観察する」「〜に報告する」のように。' });
   }
 
   if (f.filter((x) => x.severity === 'error').length === 0 && f.filter((x) => x.severity === 'warn').length === 0) {
-    f.unshift({ severity: 'good', part: '全体', message: '事実と推測が分けて書けています。数字・時刻も入っています。' });
+    f.unshift({ code: 'good', severity: 'good', part: '全体', message: '事実と推測が分けて書けています。数字・時刻も入っています。' });
   }
   return f;
 }
