@@ -1,5 +1,5 @@
 import { Ruby } from '../components/Ruby';
-import { categoryById } from '../data/categories';
+import { categoryById, catName } from '../data/categories';
 import { SCENARIOS } from '../data/scenarios';
 import { t } from '../i18n';
 import {
@@ -82,7 +82,7 @@ export function Home({ lang, records, quizzes, dailyGoal, onScenario, onQuiz, on
             <b><Ruby text={todays.title} /></b>
             <div className="meta">
               <span className={`badge lv${todays.level}`}>{t(lang, 'level')} {todays.level}</span>
-              {lang === 'my' ? tc.nameMy : tc.name} ・ {t(lang, 'aboutMin')}
+              {catName(tc, lang)} ・ {t(lang, 'aboutMin')}
             </div>
           </div>
           <span className="go">›</span>
@@ -132,7 +132,7 @@ export function Home({ lang, records, quizzes, dailyGoal, onScenario, onQuiz, on
           {progress.map(({ category, total, mastered: m }) => (
             <button key={category.id} className="cat-row" onClick={onPractice}>
               <span className="ico">{category.icon}</span>
-              <span className="name">{lang === 'my' ? category.nameMy : category.name}</span>
+              <span className="name">{catName(category, lang)}</span>
               <span className="bar small"><span style={{ width: `${(m / total) * 100}%` }} /></span>
               <span className="count">{m}/{total}</span>
             </button>

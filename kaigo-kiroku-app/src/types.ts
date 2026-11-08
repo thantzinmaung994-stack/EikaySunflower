@@ -16,7 +16,6 @@ export interface FieldDef {
 export interface CategoryDef {
   id: CategoryId;
   name: string;
-  nameMy: string;
   icon: string;
   color: string;
   /** この記録で特に気をつけること */
@@ -76,7 +75,6 @@ export interface Scenario {
   resident: string;
   /** 場面の文章。改行区切り */
   story: string;
-  storyMy?: string;
   expected: Record<string, ExpectedField>;
   keyPoints: KeyPoint[];
   model: { w: FiveW1H; soap: Soap };

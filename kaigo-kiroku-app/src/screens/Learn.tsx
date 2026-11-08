@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Ruby } from '../components/Ruby';
 import { LESSONS } from '../data/lessons';
 import { t } from '../i18n';
+import { my } from '../lib/myanmar';
 import type { Lang } from '../types';
 import { Glossary } from './Glossary';
 
@@ -25,7 +26,7 @@ export function Learn({ lang }: { lang: Lang }) {
               <details open={l.id === 'fact'}>
                 <summary>
                   <Ruby text={l.title} />
-                  {lang === 'my' && <span className="muted" style={{ display: 'block', fontWeight: 400 }}>{l.titleMy}</span>}
+                  {lang === 'my' && my(`lesson.${l.id}.title`) && <span className="muted" style={{ display: 'block', fontWeight: 400 }}>{my(`lesson.${l.id}.title`)}</span>}
                 </summary>
                 <ul className="lesson-body">
                   {l.body.map((b) => <li key={b}><Ruby text={b} /></li>)}

@@ -3,6 +3,7 @@ import { Ruby } from '../components/Ruby';
 import { FACT_QUIZ, type FactItem } from '../data/factQuiz';
 import { t } from '../i18n';
 import { missedQuizIds, quizStats } from '../lib/progress';
+import { my } from '../lib/myanmar';
 import { newId } from '../lib/storage';
 import type { Lang, QuizResult } from '../types';
 
@@ -152,7 +153,7 @@ export function FactQuiz({ lang, quizzes, onFinish }: Props) {
             <span className="part">{answers[q.id] ? '○' : '×'}</span>
             <div>
               <Ruby text={q.why} />
-              {lang === 'my' && q.whyMy && <span className="sug">{q.whyMy}</span>}
+              {lang === 'my' && my(`quiz.${q.id}.why`) && <span className="sug">{my(`quiz.${q.id}.why`)}</span>}
               {q.better && <span className="sug">→ <Ruby text={q.better} /></span>}
             </div>
           </div>

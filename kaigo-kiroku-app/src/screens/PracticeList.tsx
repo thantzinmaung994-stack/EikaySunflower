@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Ruby } from '../components/Ruby';
-import { CATEGORIES, categoryById } from '../data/categories';
+import { CATEGORIES, categoryById, catName } from '../data/categories';
 import { SCENARIOS } from '../data/scenarios';
 import { t } from '../i18n';
 import type { CategoryId, Lang, RecordEntry } from '../types';
@@ -32,7 +32,7 @@ export function PracticeList({ lang, records, onSelect, onFree }: Props) {
           {CATEGORIES.filter((c) => SCENARIOS.some((s) => s.category === c.id)).map((c) => (
             <button key={c.id} className={`cat-tile${filter === c.id ? ' active' : ''}`} onClick={() => setFilter(c.id)}>
               <span className="ico">{c.icon}</span>
-              {lang === 'my' ? c.nameMy : c.name}
+              {catName(c, lang)}
             </button>
           ))}
         </div>

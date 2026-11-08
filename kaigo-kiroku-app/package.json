@@ -11,7 +11,8 @@
     "test": "vitest run",
     "cap:sync": "npm run build && cap sync",
     "cap:ios": "npm run cap:sync && cap open ios",
-    "cap:android": "npm run cap:sync && cap open android"
+    "cap:android": "npm run cap:sync && cap open android",
+    "my:sync": "vite-node scripts/sync-myanmar.mts"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
@@ -29,6 +30,7 @@
     "@vitejs/plugin-react": "^4.7.0",
     "typescript": "~5.9.0",
     "vite": "^6.4.4",
+    "vite-node": "^3.2.4",
     "vitest": "^3.2.7"
   }
 }

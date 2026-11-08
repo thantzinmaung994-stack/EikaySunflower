@@ -1,7 +1,6 @@
 export interface Lesson {
   id: string;
   title: string;
-  titleMy: string;
   body: string[];
   /** 良い例・悪い例 */
   examples?: { bad: string; good: string; why: string }[];
@@ -11,7 +10,6 @@ export const LESSONS: Lesson[] = [
   {
     id: 'purpose',
     title: '記録の目的',
-    titleMy: 'မှတ်တမ်း၏ ရည်ရွယ်ချက်',
     body: [
       '利用者の生活の質を向上させるため',
       'より適切な介護サービスを提供するため',
@@ -24,7 +22,6 @@ export const LESSONS: Lesson[] = [
   {
     id: 'fact',
     title: '事実と解釈を分ける',
-    titleMy: 'အချက်အလက်နှင့် အမြင်ကို ခွဲခြားရန်',
     body: [
       '記録に書くのは「見たこと」「聞いたこと」「測ったこと」。',
       '「〜と思う」「〜だろう」「〜のはずだ」「〜かもしれない」は推測。国家試験では「客観的事実ではない」と出題される。',
@@ -40,7 +37,6 @@ export const LESSONS: Lesson[] = [
   {
     id: '5w1h',
     title: '5W1Hで書く',
-    titleMy: '5W1H ဖြင့် ရေးရန်',
     body: [
       'When いつ：時刻（7:30、12時40分）',
       'Where どこで：場所（居室、食堂、トイレ、浴室）',
@@ -56,7 +52,6 @@ export const LESSONS: Lesson[] = [
   {
     id: 'soap',
     title: 'SOAP方式',
-    titleMy: 'SOAP နည်းလမ်း',
     body: [
       'S（Subjective）主観的情報：利用者の言葉・訴え。「」で、言ったとおりに。',
       'O（Objective）客観的情報：職員が見たこと・聞いたこと・測ったこと。数字・時刻で。',
@@ -74,7 +69,6 @@ export const LESSONS: Lesson[] = [
   {
     id: 'numbers',
     title: '数字と時刻で書く',
-    titleMy: 'ကိန်းဂဏန်းနှင့် အချိန်ဖြင့် ရေးရန်',
     body: [
       '「たくさん」「少し」「あまり」ではなく、「主食8割」「150ml」「2回」「直径2cm」。',
       '「いつもより少ない」は、普段の量と今日の量を両方書く。',
@@ -89,7 +83,6 @@ export const LESSONS: Lesson[] = [
   {
     id: 'dignity',
     title: '尊厳を守る言葉',
-    titleMy: 'ဂုဏ်သိက္ခာ စောင့်ထိန်းသော စကားလုံး',
     body: [
       '記録は利用者・家族が読むことができる。読まれて困る言葉は使わない。',
       '「徘徊」「暴言」「暴力」「不穏」「わがまま」「問題行動」はラベル。見た行動・言葉をそのまま書く。',
@@ -103,7 +96,6 @@ export const LESSONS: Lesson[] = [
   {
     id: 'rules',
     title: '記録の留意点（国家試験の出題ポイント）',
-    titleMy: 'မှတ်တမ်း သတိပြုရန် အချက်များ',
     body: [
       '介護を実施した日に記録する（後日まとめて書かない）。',
       '正確で簡潔に。誰が読んでもわかるように書く。',

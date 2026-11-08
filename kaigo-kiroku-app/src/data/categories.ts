@@ -1,4 +1,5 @@
-import type { CategoryDef, CategoryId } from '../types';
+import { my } from '../lib/myanmar';
+import type { CategoryDef, CategoryId, Lang } from '../types';
 
 const ASSIST = ['自立', '見守り', '一部介助', '全介助'];
 
@@ -6,7 +7,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'vital',
     name: 'バイタル',
-    nameMy: 'ဗိုင်တယ်ဆိုင်း (ကိုယ်အပူချိန်・သွေးပေါင်)',
     icon: '🌡️',
     color: '#ef4444',
     tips: [
@@ -28,7 +28,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'meal',
     name: '食事・水分',
-    nameMy: 'အစားအစာနှင့် ရေသောက်မှု',
     icon: '🍚',
     color: '#f59e0b',
     tips: [
@@ -50,7 +49,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'excretion',
     name: '排泄',
-    nameMy: 'ကျင်ကြီး・ကျင်ငယ်',
     icon: '🚻',
     color: '#8b5cf6',
     tips: [
@@ -72,7 +70,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'bath',
     name: '入浴',
-    nameMy: 'ရေချိုးခြင်း',
     icon: '🛁',
     color: '#0ea5e9',
     tips: [
@@ -93,7 +90,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'medication',
     name: '服薬',
-    nameMy: 'ဆေးသောက်ခြင်း',
     icon: '💊',
     color: '#10b981',
     tips: [
@@ -112,7 +108,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'sleep',
     name: '睡眠・夜間',
-    nameMy: 'အိပ်စက်ခြင်း・ညအချိန်',
     icon: '🌙',
     color: '#6366f1',
     tips: [
@@ -130,7 +125,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'oral',
     name: '口腔ケア',
-    nameMy: 'ခံတွင်းသန့်ရှင်းရေး',
     icon: '🪥',
     color: '#14b8a6',
     tips: ['義歯の有無と洗浄', '口の中の出血・傷・食べ残しの有無', 'うがいができたか（むせはないか）'],
@@ -144,7 +138,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'position',
     name: '体位変換・移乗',
-    nameMy: 'ကိုယ်အနေအထားပြောင်း・ရွှေ့ပြောင်းခြင်း',
     icon: '🛏️',
     color: '#a855f7',
     tips: ['何時に、どの体位からどの体位にしたか', '皮膚の発赤・痛みの訴え', '移乗の方法と人数（2人介助など）'],
@@ -159,7 +152,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'activity',
     name: '活動・レク',
-    nameMy: 'လှုပ်ရှားမှု・အပန်းဖြေ',
     icon: '🎵',
     color: '#ec4899',
     tips: ['「楽しそうだった」ではなく、表情・言葉・参加した時間を書く', '本人の言葉は「」で', '参加しなかった場合はその理由（本人の言葉）'],
@@ -173,7 +165,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'behavior',
     name: '様子・行動（認知症ケア）',
-    nameMy: 'အပြုအမူ・စိတ်အခြေအနေ',
     icon: '🧠',
     color: '#64748b',
     tips: [
@@ -190,7 +181,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'incident',
     name: 'ヒヤリハット・事故',
-    nameMy: 'ဟိယာရိဟတ်တို (အန္တရာယ်နီးပါးဖြစ်ရပ်)',
     icon: '⚠️',
     color: '#dc2626',
     tips: [
@@ -212,7 +202,6 @@ export const CATEGORIES: CategoryDef[] = [
   {
     id: 'handover',
     name: '申し送り',
-    nameMy: 'တာဝန်လွှဲပြောင်းမှတ်စု',
     icon: '📋',
     color: '#0284c7',
     tips: ['結論（何を見てほしいか）を先に', '数字と時刻を正確に', '次の勤務帯で「何を・いつまでに」してほしいかを書く'],
@@ -226,3 +215,6 @@ export const CATEGORIES: CategoryDef[] = [
 
 export const categoryById = (id: CategoryId): CategoryDef =>
   CATEGORIES.find((c) => c.id === id) ?? CATEGORIES[0];
+
+/** 記録の種類の名前（ミャンマー語は translations/myanmar.csv の category.<id>） */
+export const catName = (c: CategoryDef, lang: Lang) => (lang === 'my' ? my(`category.${c.id}`) ?? c.name : c.name);

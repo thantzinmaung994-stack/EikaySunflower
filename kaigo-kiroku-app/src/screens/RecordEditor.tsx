@@ -2,9 +2,10 @@ import { useMemo, useState } from 'react';
 import { FieldInput } from '../components/FieldInput';
 import { Ruby } from '../components/Ruby';
 import { ResultPanel } from '../components/ResultPanel';
-import { CATEGORIES, categoryById } from '../data/categories';
+import { CATEGORIES, categoryById, catName } from '../data/categories';
 import { t } from '../i18n';
 import { evaluate, type CheckResult } from '../lib/checker';
+import { my } from '../lib/myanmar';
 import { newId } from '../lib/storage';
 import type { CategoryId, FiveW1H, Lang, RecordEntry, Scenario, Soap } from '../types';
 
@@ -98,7 +99,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
 
       <div className="card" style={{ borderLeft: `5px solid ${category.color}` }}>
         <div className="muted">
-          {scenario ? t(lang, 'mode_scenario') : t(lang, 'mode_free')} ・ {category.icon} {lang === 'my' ? category.nameMy : category.name}
+          {scenario ? t(lang, 'mode_scenario') : t(lang, 'mode_free')} ・ {category.icon} {catName(category, lang)}
           {scenario && <> ・ <span className={`badge lv${scenario.level}`}>Lv.{scenario.level}</span></>}
         </div>
         {scenario && <h2 style={{ marginTop: 4 }}><Ruby text={scenario.title} /></h2>}
@@ -109,7 +110,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
           <h2>{t(lang, 'scene')}</h2>
           <div className="muted" style={{ marginBottom: 6 }}>{t(lang, 'resident')}: {scenario.resident}</div>
           <div className="story"><Ruby text={scenario.story} /></div>
-          {lang === 'my' && scenario.storyMy && <div className="story-my">{scenario.storyMy}</div>}
+          {lang === 'my' && my(`scenario.${scenario.id}.story`) && <div className="story-my">{my(`scenario.${scenario.id}.story`)}</div>}
           <h3>{t(lang, 'tips')}</h3>
           <ul className="tips">
             {category.tips.map((x) => <li key={x}><Ruby text={x} /></li>)}
@@ -126,7 +127,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
                 {CATEGORIES.map((c) => (
                   <button key={c.id} className={`cat-tile${c.id === categoryId ? ' active' : ''}`} onClick={() => { setCategoryId(c.id); setFields({}); }}>
                     <span className="ico">{c.icon}</span>
-                    {lang === 'my' ? c.nameMy : c.name}
+                    {catName(c, lang)}
                   </button>
                 ))}
               </div>

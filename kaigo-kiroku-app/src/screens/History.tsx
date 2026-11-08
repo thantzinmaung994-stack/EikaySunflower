@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { categoryById } from '../data/categories';
+import { categoryById, catName } from '../data/categories';
 import { scenarioById } from '../data/scenarios';
 import { t } from '../i18n';
 import type { Lang, RecordEntry } from '../types';
@@ -29,7 +29,7 @@ export function History({ lang, records, onDelete }: Props) {
             <button className="list-item" onClick={() => setOpenId(open ? null : r.id)}>
               <span className="ico">{c.icon}</span>
               <div className="body">
-                <b>{sc?.title ?? (lang === 'my' ? c.nameMy : c.name)}</b>
+                <b>{sc?.title ?? (catName(c, lang))}</b>
                 <div className="meta">
                   <span className="badge">{r.mode === 'scenario' ? t(lang, 'mode_scenario') : t(lang, 'mode_free')}</span>
                   {r.resident} ・ {new Date(r.createdAt).toLocaleString('ja-JP', { dateStyle: 'short', timeStyle: 'short' })}

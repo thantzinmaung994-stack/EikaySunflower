@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Ruby } from '../components/Ruby';
 import { GLOSSARY, type GlossaryGroup } from '../data/glossary';
 import { t } from '../i18n';
+import { my } from '../lib/myanmar';
 import type { Lang } from '../types';
 
 const toKata = (s: string) => s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
@@ -17,7 +18,7 @@ export function Glossary({ lang }: { lang: Lang }) {
       if (group !== 'all' && g.group !== group) return false;
       if (!k) return true;
       // 漢字・ひらがな・カタカナ・ミャンマー語・英字のどれでも探せる
-      return [g.term, g.yomi, toKata(g.yomi), g.my, g.meaning].some((x) => x.toLowerCase().includes(k.toLowerCase()) || toKata(x).includes(toKata(k)));
+      return [g.term, g.yomi, toKata(g.yomi), my(`glossary.${g.term}`) ?? '', g.meaning].some((x) => x.toLowerCase().includes(k.toLowerCase()) || toKata(x).includes(toKata(k)));
     });
   }, [q, group]);
 
@@ -42,7 +43,7 @@ export function Glossary({ lang }: { lang: Lang }) {
             <b className="term-word">{g.term}</b>
             <span className="term-yomi">{g.yomi}</span>
           </div>
-          <div className="term-my">🇲🇲 {g.my}</div>
+          {my(`glossary.${g.term}`) && <div className="term-my">🇲🇲 {my(`glossary.${g.term}`)}</div>}
           <div className="term-meaning"><Ruby text={g.meaning} /></div>
           {g.example && <div className="term-example">✍ <Ruby text={g.example} /></div>}
         </div>

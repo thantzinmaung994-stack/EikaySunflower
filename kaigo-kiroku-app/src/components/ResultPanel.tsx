@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { CheckResult } from '../lib/checker';
 import type { Lang, Scenario } from '../types';
 import { t } from '../i18n';
+import { my } from '../lib/myanmar';
 import { Ruby } from './Ruby';
 
 interface Props {
@@ -118,6 +119,7 @@ export function ResultPanel({ result, scenario, lang }: Props) {
               </dl>
               <h3>{t(lang, 'explanation')}</h3>
               <p style={{ fontSize: 14, margin: 0 }}><Ruby text={scenario.explanation} /></p>
+              {lang === 'my' && my(`scenario.${scenario.id}.explanation`) && <p className="story-my">{my(`scenario.${scenario.id}.explanation`)}</p>}
             </>
           )}
         </div>
