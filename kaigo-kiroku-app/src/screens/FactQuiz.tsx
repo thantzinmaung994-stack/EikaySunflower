@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Ruby } from '../components/Ruby';
 import { FACT_QUIZ, type FactItem } from '../data/factQuiz';
 import { t } from '../i18n';
+import { isFreeQuiz } from '../lib/premium';
 import { missedQuizIds, quizStats } from '../lib/progress';
 import { my } from '../lib/myanmar';
 import { newId } from '../lib/storage';
@@ -11,6 +12,8 @@ interface Props {
   lang: Lang;
   quizzes: QuizResult[];
   onFinish: (r: QuizResult) => void;
+  premium: boolean;
+  onLocked: () => void;
 }
 
 const ROUND = 10;
@@ -24,8 +27,10 @@ function shuffle<T>(a: T[]): T[] {
   return x;
 }
 
-export function FactQuiz({ lang, quizzes, onFinish }: Props) {
-  const missed = useMemo(() => missedQuizIds(quizzes), [quizzes]);
+export function FactQuiz({ lang, quizzes, onFinish, premium, onLocked }: Props) {
+  // 無料プランは約25%の問題だけ（isFreeQuiz）
+  const available = useMemo(() => (premium ? FACT_QUIZ : FACT_QUIZ.filter(isFreeQuiz)), [premium]);
+  const missed = useMemo(() => missedQuizIds(quizzes).filter((id) => available.some((q) => q.id === id)), [quizzes, available]);
   const stats = quizStats(quizzes);
   const [items, setItems] = useState<FactItem[] | null>(null);
   const [idx, setIdx] = useState(0);
@@ -33,7 +38,7 @@ export function FactQuiz({ lang, quizzes, onFinish }: Props) {
   const [done, setDone] = useState(false);
 
   const start = (reviewOnly: boolean) => {
-    const pool = reviewOnly ? FACT_QUIZ.filter((q) => missed.includes(q.id)) : FACT_QUIZ;
+    const pool = reviewOnly ? available.filter((q) => missed.includes(q.id)) : available;
     setItems(shuffle(pool).slice(0, ROUND));
     setIdx(0);
     setAnswers({});
@@ -47,6 +52,11 @@ export function FactQuiz({ lang, quizzes, onFinish }: Props) {
         <div className="card">
           <h2>{t(lang, 'quizTitle')}</h2>
           <p style={{ margin: '0 0 12px' }}><Ruby text={t(lang, 'quizIntro')} /></p>
+          {!premium && (
+            <button className="lock-note" onClick={onLocked}>
+              🔒 {t(lang, 'freeQuizNote').replace('{free}', String(available.length)).replace('{all}', String(FACT_QUIZ.length))}
+            </button>
+          )}
           <button className="btn" onClick={() => start(false)}>▶ {t(lang, 'quizStart')}（{ROUND}{t(lang, 'questions')}）</button>
           {missed.length > 0 && (
             <button className="btn secondary" style={{ marginTop: 8 }} onClick={() => start(true)}>

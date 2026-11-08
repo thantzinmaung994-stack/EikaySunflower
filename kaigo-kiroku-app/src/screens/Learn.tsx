@@ -6,7 +6,7 @@ import { my } from '../lib/myanmar';
 import type { Lang } from '../types';
 import { Glossary } from './Glossary';
 
-export function Learn({ lang }: { lang: Lang }) {
+export function Learn({ lang, premium, onLocked }: { lang: Lang; premium: boolean; onLocked: () => void }) {
   const [tab, setTab] = useState<'basics' | 'glossary'>('basics');
   return (
     <>
@@ -15,7 +15,7 @@ export function Learn({ lang }: { lang: Lang }) {
         <button className={tab === 'glossary' ? 'on' : ''} onClick={() => setTab('glossary')}>📖 {t(lang, 'glossaryTitle')}</button>
       </div>
       {tab === 'glossary' ? (
-        <Glossary lang={lang} />
+        <Glossary lang={lang} premium={premium} onLocked={onLocked} />
       ) : (
         <>
           <div className="card">

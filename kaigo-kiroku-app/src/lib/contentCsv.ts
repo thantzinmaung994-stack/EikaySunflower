@@ -53,7 +53,7 @@ export function parseScenarios(text: string, builtinIds: Set<string>, errors: Co
     const id = r['id'];
     if (!/^[a-z0-9-]+$/.test(id)) err('id は半角の英小文字・数字・ハイフンで（例：vital-k01）');
     else if (builtinIds.has(id) || seen.has(id)) err(`id「${id}」はすでに使われています`);
-    else if (id.endsWith('-01')) err('id の最後が「-01」だと無料の場面になってしまいます。「-k01」のようにしてください');
+    else if (/-0[1-3]$/.test(id)) err('id の最後が「-01」〜「-03」だと無料の場面になってしまいます。「-k01」のようにしてください');
     seen.add(id);
     const cat = findCategory(r['種類']);
     if (!cat) err(`種類「${r['種類']}」がありません。使えるのは：${CATEGORIES.map((c) => c.name).join('／')}`);

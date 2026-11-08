@@ -141,11 +141,11 @@ export default function App() {
   } else if (view.tab === 'practice') {
     body = <PracticeList lang={lang} records={records} onSelect={(id) => go({ kind: 'scenario', id })} onFree={() => go({ kind: 'free' })} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
   } else if (view.tab === 'quiz') {
-    body = <FactQuiz lang={lang} quizzes={quizzes} onFinish={addQuiz} />;
+    body = <FactQuiz lang={lang} quizzes={quizzes} onFinish={addQuiz} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
   } else if (view.tab === 'history') {
     body = <History lang={lang} records={records} onDelete={remove} />;
   } else {
-    body = <Learn lang={lang} />;
+    body = <Learn lang={lang} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
   }
 
   return (

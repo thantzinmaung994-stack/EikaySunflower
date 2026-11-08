@@ -1,6 +1,8 @@
 import contentCsv from '../../content/scenarios.csv?raw';
 import { CONTENT_ERRORS, parseScenarios } from '../lib/contentCsv';
 import type { Scenario } from '../types';
+import { CATEGORIES } from './categories';
+import { EXTRA_SCENARIOS } from './scenarios-extra';
 
 /**
  * 練習用の場面。登場人物はすべて架空。
@@ -1834,7 +1836,11 @@ const BUILTIN: Scenario[] = [
 ];
 
 /** 組み込みの場面 ＋ 講師が content/scenarios.csv に書いた場面 */
-export const CSV_SCENARIOS: Scenario[] = parseScenarios(contentCsv, new Set(BUILTIN.map((s) => s.id)), CONTENT_ERRORS);
-export const SCENARIOS: Scenario[] = [...BUILTIN, ...CSV_SCENARIOS];
+const order = (s: Scenario) => CATEGORIES.findIndex((c) => c.id === s.category);
+const BASE: Scenario[] = [...BUILTIN, ...EXTRA_SCENARIOS]
+  // 記録の種類の順 → 番号の順（無料の -01〜-03 が各種類の先頭に来る）
+  .sort((a, b) => order(a) - order(b) || a.id.localeCompare(b.id));
+export const CSV_SCENARIOS: Scenario[] = parseScenarios(contentCsv, new Set(BASE.map((s) => s.id)), CONTENT_ERRORS);
+export const SCENARIOS: Scenario[] = [...BASE, ...CSV_SCENARIOS];
 
 export const scenarioById = (id: string) => SCENARIOS.find((s) => s.id === id);

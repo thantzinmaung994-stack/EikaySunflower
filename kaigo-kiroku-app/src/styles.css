@@ -232,3 +232,6 @@ a.btn { text-decoration: none; }
 .lock-badge { flex: none; font-size: 11px; font-weight: 700; color: var(--gold-text); background: var(--gold-soft); border: 1px solid var(--gold); border-radius: 999px; padding: 2px 8px; }
 .premium-row { margin-bottom: 12px; border-color: var(--gold); background: var(--gold-soft); }
 .premium-row .meta { color: var(--gold-text); }
+.lock-note { display: block; width: 100%; text-align: left; border: 1px dashed var(--gold); background: var(--gold-soft); color: var(--gold-text); border-radius: 10px; padding: 8px 10px; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+.locked-terms { text-align: center; border-style: dashed; border-color: var(--gold); background: var(--gold-soft); }
+.locked-terms .preview { color: var(--muted); font-size: 13px; margin: 4px 0 8px; }

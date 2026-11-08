@@ -1156,5 +1156,7 @@ const BUILTIN: GlossaryTerm[] = [
 const MORE = TERMS as GlossaryTerm[];
 
 const BASE = [...BUILTIN, ...MORE];
+/** 介護記録の基本の用語（最初に作った語。無料プランでも全部使える） */
+export const CORE_TERMS = new Set(BUILTIN.map((g) => g.term));
 export const CSV_GLOSSARY: GlossaryTerm[] = parseGlossary(contentCsv, new Set(BASE.map((g) => g.term)), GLOSSARY_GROUPS, CONTENT_ERRORS);
 export const GLOSSARY: GlossaryTerm[] = [...BASE, ...CSV_GLOSSARY];

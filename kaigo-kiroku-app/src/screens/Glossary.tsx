@@ -3,13 +3,14 @@ import { Ruby } from '../components/Ruby';
 import { GLOSSARY, GLOSSARY_GROUPS, type GlossaryGroup } from '../data/glossary';
 import { t } from '../i18n';
 import { my } from '../lib/myanmar';
+import { isFreeTerm } from '../lib/premium';
 import type { Lang } from '../types';
 
 const PAGE = 60;
 
 const toKata = (s: string) => s.replace(/[ぁ-ゖ]/g, (c) => String.fromCharCode(c.charCodeAt(0) + 0x60));
 
-export function Glossary({ lang }: { lang: Lang }) {
+export function Glossary({ lang, premium, onLocked }: { lang: Lang; premium: boolean; onLocked: () => void }) {
   const [q, setQ] = useState('');
   const [group, setGroup] = useState<GlossaryGroup | 'all'>('all');
   const [shown, setShown] = useState(PAGE);
@@ -20,7 +21,7 @@ export function Glossary({ lang }: { lang: Lang }) {
     () => [...GLOSSARY].sort((a, b) => GLOSSARY_GROUPS.indexOf(a.group) - GLOSSARY_GROUPS.indexOf(b.group) || a.yomi.localeCompare(b.yomi, 'ja')),
     [],
   );
-  const list = useMemo(() => {
+  const matches = useMemo(() => {
     const k = q.trim();
     return sorted.filter((g) => {
       if (group !== 'all' && g.group !== group) return false;
@@ -29,6 +30,10 @@ export function Glossary({ lang }: { lang: Lang }) {
       return [g.term, g.yomi, toKata(g.yomi), my(`glossary.${g.term}`) ?? '', g.meaning].some((x) => x.toLowerCase().includes(k.toLowerCase()) || toKata(x).includes(toKata(k)));
     });
   }, [q, group, sorted]);
+  // 無料プランは約25%の用語だけ。条件に合うプレミアムの用語は、数と見出しだけ見せる
+  const list = useMemo(() => (premium ? matches : matches.filter(isFreeTerm)), [matches, premium]);
+  const locked = useMemo(() => (premium ? [] : matches.filter((g) => !isFreeTerm(g))), [matches, premium]);
+  const freeTotal = useMemo(() => GLOSSARY.filter(isFreeTerm).length, []);
 
   // 検索やグループを変えたら、また先頭から60語だけ出す
   useEffect(() => setShown(PAGE), [q, group]);
@@ -49,6 +54,11 @@ export function Glossary({ lang }: { lang: Lang }) {
           </select>
         </div>
         <div className="muted" style={{ marginTop: 6 }}>{list.length} {t(lang, 'terms')}</div>
+        {!premium && (
+          <button className="lock-note" style={{ marginTop: 8, marginBottom: 0 }} onClick={onLocked}>
+            🔒 {t(lang, 'freeTermsNote').replace('{free}', String(freeTotal)).replace('{all}', String(GLOSSARY.length))}
+          </button>
+        )}
       </div>
       {list.slice(0, shown).map((g) => (
         <div className="card term" key={g.term}>
@@ -66,7 +76,14 @@ export function Glossary({ lang }: { lang: Lang }) {
           {t(lang, 'showMore')}（{shown}/{list.length}）
         </button>
       )}
-      {list.length === 0 && <div className="empty">{t(lang, 'noMatch')}</div>}
+      {locked.length > 0 && list.length <= shown && (
+        <div className="card locked-terms">
+          <b>🔒 {t(lang, 'lockedTerms').replace('{n}', String(locked.length))}</b>
+          <div className="preview">{locked.slice(0, 6).map((g) => g.term).join('・')}{locked.length > 6 ? ' …' : ''}</div>
+          <button className="btn gold small" onClick={onLocked}>{t(lang, 'seePremium')}</button>
+        </div>
+      )}
+      {list.length === 0 && locked.length === 0 && <div className="empty">{t(lang, 'noMatch')}</div>}
     </>
   );
 }

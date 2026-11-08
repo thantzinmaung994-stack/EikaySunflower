@@ -13,7 +13,7 @@ export interface FactItem {
   better?: string;
 }
 
-const BUILTIN: FactItem[] = [
+export const BUILTIN_QUIZ: FactItem[] = [
   {
     id: 'f01',
     text: '22時、0時、2時の巡視時、E様は閉眼し寝息を立てていた。',
@@ -408,5 +408,5 @@ const BUILTIN: FactItem[] = [
 ];
 
 /** 組み込みの問題 ＋ 講師が content/quiz.csv に書いた問題 */
-export const CSV_QUIZ: FactItem[] = parseQuiz(contentCsv, new Set(BUILTIN.map((q) => q.id)), CONTENT_ERRORS);
-export const FACT_QUIZ: FactItem[] = [...BUILTIN, ...CSV_QUIZ];
+export const CSV_QUIZ: FactItem[] = parseQuiz(contentCsv, new Set(BUILTIN_QUIZ.map((q) => q.id)), CONTENT_ERRORS);
+export const FACT_QUIZ: FactItem[] = [...BUILTIN_QUIZ, ...CSV_QUIZ];

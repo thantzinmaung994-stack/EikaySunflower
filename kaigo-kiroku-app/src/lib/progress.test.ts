@@ -67,13 +67,28 @@ describe('review and missed quiz items', () => {
 });
 
 describe('free plan', () => {
-  it('has exactly one free scenario per record type', async () => {
+  it('has exactly three free scenarios per record type', async () => {
     const { SCENARIOS } = await import('../data/scenarios');
     const { CATEGORIES } = await import('../data/categories');
     const { isFreeScenario } = await import('./premium');
-    const free = SCENARIOS.filter(isFreeScenario);
-    expect(free.length).toBe(CATEGORIES.length);
-    expect(new Set(free.map((s) => s.category)).size).toBe(CATEGORIES.length);
+    for (const c of CATEGORIES) {
+      expect(SCENARIOS.filter((s) => s.category === c.id && isFreeScenario(s)).length, c.id).toBe(3);
+    }
+  });
+  it('opens about a quarter of the quiz and the glossary, balanced', async () => {
+    const { FACT_QUIZ } = await import('../data/factQuiz');
+    const { GLOSSARY, GLOSSARY_GROUPS } = await import('../data/glossary');
+    const { isFreeQuiz, isFreeTerm } = await import('./premium');
+    const fq = FACT_QUIZ.filter(isFreeQuiz);
+    expect(fq.length / FACT_QUIZ.length).toBeGreaterThan(0.2);
+    expect(fq.length / FACT_QUIZ.length).toBeLessThan(0.32);
+    expect(fq.filter((q) => q.answer === 'fact').length).toBeGreaterThanOrEqual(6);
+    expect(fq.filter((q) => q.answer === 'interp').length).toBeGreaterThanOrEqual(6);
+    const ft = GLOSSARY.filter(isFreeTerm);
+    expect(ft.length / GLOSSARY.length).toBeGreaterThan(0.2);
+    expect(ft.length / GLOSSARY.length).toBeLessThan(0.32);
+    // どのグループにも無料の用語がある
+    for (const g of GLOSSARY_GROUPS) expect(ft.some((x) => x.group === g), g).toBe(true);
   });
   it("today's scenario stays inside the free plan when not subscribed", async () => {
     const { isFreeScenario } = await import('./premium');

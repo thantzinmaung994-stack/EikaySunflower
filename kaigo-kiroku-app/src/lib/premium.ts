@@ -1,5 +1,7 @@
 import { Capacitor } from '@capacitor/core';
 import { Purchases, type CustomerInfo, type PurchasesPackage } from '@revenuecat/purchases-capacitor';
+import { CORE_TERMS, type GlossaryTerm } from '../data/glossary';
+import { BUILTIN_QUIZ, type FactItem } from '../data/factQuiz';
 import type { Scenario } from '../types';
 
 /**
@@ -10,8 +12,30 @@ import type { Scenario } from '../types';
  */
 export const ENTITLEMENT = 'premium';
 
-/** 無料で使える場面：各種類の1本目（id が -01 のもの） */
-export const isFreeScenario = (s: Pick<Scenario, 'id'>) => s.id.endsWith('-01');
+/** 無料で使える場面：各種類の1〜3本目（id が -01・-02・-03 のもの） */
+export const isFreeScenario = (s: Pick<Scenario, 'id'>) => /-0[1-3]$/.test(s.id);
+
+/**
+ * 無料で使えるクイズ：約25%。事実・解釈それぞれの4問に1問（偏らないように）。
+ * 講師が追加した問題はプレミアム。
+ */
+const FREE_QUIZ = new Set(
+  (['fact', 'interp'] as const).flatMap((a) => BUILTIN_QUIZ.filter((q) => q.answer === a).filter((_, i) => i % 4 === 0).map((q) => q.id)),
+);
+export const isFreeQuiz = (q: Pick<FactItem, 'id'>) => FREE_QUIZ.has(q.id);
+
+/** 用語の名前から 0〜99 の数を決める（毎回同じ値になる） */
+function bucket(term: string): number {
+  let h = 2166136261;
+  for (const c of term) h = Math.imul(h ^ c.codePointAt(0)!, 16777619);
+  return (h >>> 0) % 100;
+}
+
+/**
+ * 無料で使える用語：約25%。介護記録の基本の用語（最初の161語）はすべて無料、
+ * ほかは用語ごとに決まった約2割（グループにかたよらないよう、名前から決める）。
+ */
+export const isFreeTerm = (g: Pick<GlossaryTerm, 'term'>) => CORE_TERMS.has(g.term) || bucket(g.term) < 21;
 
 const apiKey = () =>
   Capacitor.getPlatform() === 'ios'
