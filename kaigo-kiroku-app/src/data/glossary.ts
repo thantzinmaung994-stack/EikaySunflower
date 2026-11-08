@@ -1,3 +1,5 @@
+import contentCsv from '../../content/glossary.csv?raw';
+import { CONTENT_ERRORS, parseGlossary } from '../lib/contentCsv';
 /**
  * 介護記録の用語辞典
  * - yomi: ひらがな（カタカナ語・略語はカタカナ）
@@ -37,7 +39,7 @@ export const GLOSSARY_GROUPS: GlossaryGroup[] = [
   '略語',
 ];
 
-export const GLOSSARY: GlossaryTerm[] = [
+const BUILTIN: GlossaryTerm[] = [
   // ───────── 記録の基本 ─────────
   {
     term: '介護記録',
@@ -1146,3 +1148,7 @@ export const GLOSSARY: GlossaryTerm[] = [
     group: '略語',
   },
 ];
+
+/** 組み込みの用語 ＋ 講師が content/glossary.csv に書いた用語 */
+export const CSV_GLOSSARY: GlossaryTerm[] = parseGlossary(contentCsv, new Set(BUILTIN.map((g) => g.term)), GLOSSARY_GROUPS, CONTENT_ERRORS);
+export const GLOSSARY: GlossaryTerm[] = [...BUILTIN, ...CSV_GLOSSARY];

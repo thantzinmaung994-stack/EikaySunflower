@@ -1,10 +1,12 @@
+import contentCsv from '../../content/scenarios.csv?raw';
+import { CONTENT_ERRORS, parseScenarios } from '../lib/contentCsv';
 import type { Scenario } from '../types';
 
 /**
  * 練習用の場面。登場人物はすべて架空。
  * story には、あえて職員の感想・推測を混ぜてある（記録に書いてよいのは事実、推測は A へ）。
  */
-export const SCENARIOS: Scenario[] = [
+const BUILTIN: Scenario[] = [
   {
     id: 'vital-01',
     category: 'vital',
@@ -1830,5 +1832,9 @@ export const SCENARIOS: Scenario[] = [
       '「たぶん眠れないだろう」は推測です。入所したばかりの方の申し送りでは、家族から聞いた情報（夜間のトイレ2回）や本人の不安の言葉をそのまま伝え、次の勤務帯で何をしてほしいかを書きます。環境が変わると転倒や混乱が起きやすいため、安全の工夫を具体的に書きます。',
   },
 ];
+
+/** 組み込みの場面 ＋ 講師が content/scenarios.csv に書いた場面 */
+export const CSV_SCENARIOS: Scenario[] = parseScenarios(contentCsv, new Set(BUILTIN.map((s) => s.id)), CONTENT_ERRORS);
+export const SCENARIOS: Scenario[] = [...BUILTIN, ...CSV_SCENARIOS];
 
 export const scenarioById = (id: string) => SCENARIOS.find((s) => s.id === id);

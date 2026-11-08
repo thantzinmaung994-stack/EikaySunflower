@@ -1,3 +1,5 @@
+import contentCsv from '../../content/quiz.csv?raw';
+import { CONTENT_ERRORS, parseQuiz } from '../lib/contentCsv';
 /**
  * 「事実？解釈？」クイズ
  * 事実 = 見た・聞いた・測ったこと（本人の言葉を「」でそのまま書いたものも事実）
@@ -11,7 +13,7 @@ export interface FactItem {
   better?: string;
 }
 
-export const FACT_QUIZ: FactItem[] = [
+const BUILTIN: FactItem[] = [
   {
     id: 'f01',
     text: '22時、0時、2時の巡視時、E様は閉眼し寝息を立てていた。',
@@ -404,3 +406,7 @@ export const FACT_QUIZ: FactItem[] = [
     better: '12時、O様は焼き魚に手をつけず、「魚は食べたくない」と話した。',
   },
 ];
+
+/** 組み込みの問題 ＋ 講師が content/quiz.csv に書いた問題 */
+export const CSV_QUIZ: FactItem[] = parseQuiz(contentCsv, new Set(BUILTIN.map((q) => q.id)), CONTENT_ERRORS);
+export const FACT_QUIZ: FactItem[] = [...BUILTIN, ...CSV_QUIZ];
