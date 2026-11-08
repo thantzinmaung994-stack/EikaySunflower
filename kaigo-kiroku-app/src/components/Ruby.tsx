@@ -1,5 +1,5 @@
 import { Fragment, type ReactNode } from 'react';
-import { BASE_YOMI, MANUAL_RUBY } from '../data/yomi';
+import { BASE_YOMI, MANUAL_RUBY, NO_AUTO } from '../data/yomi';
 import { GLOSSARY } from '../data/glossary';
 import { useSettings } from '../lib/settings';
 
@@ -10,7 +10,7 @@ const HIRAGANA_ONLY = /^[ぁ-ゟー]+$/;
 // 1文字の語を入れると「便」→「便利」のように別の語の一部にも付いてしまうため）
 const YOMI: Record<string, string> = { ...BASE_YOMI };
 for (const g of GLOSSARY) {
-  if (g.term.length >= 2 && KANJI.test(g.term) && HIRAGANA_ONLY.test(g.yomi) && !/[A-Za-z0-9（）()・/]/.test(g.term)) YOMI[g.term] ??= g.yomi;
+  if (!NO_AUTO.has(g.term) && g.term.length >= 2 && KANJI.test(g.term) && HIRAGANA_ONLY.test(g.yomi) && !/[A-Za-z0-9（）()・/]/.test(g.term)) YOMI[g.term] ??= g.yomi;
 }
 // 先頭の文字ごとに、長い語から並べておく（3000語でも速く探せるように）
 const BY_FIRST = new Map<string, string[]>();

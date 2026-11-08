@@ -54,7 +54,7 @@ export function Glossary({ lang }: { lang: Lang }) {
         <div className="card term" key={g.term}>
           <div className="term-head">
             <b className="term-word">{g.term}</b>
-            <span className="term-yomi">{g.yomi}</span>
+            {/[\u4e00-\u9fff々]/.test(g.term) && <span className="term-yomi">{g.yomi}</span>}
           </div>
           {my(`glossary.${g.term}`) && <div className="term-my">🇲🇲 {my(`glossary.${g.term}`)}</div>}
           <div className="term-meaning"><Ruby text={g.meaning} /></div>
