@@ -45,6 +45,10 @@ const LABELS = [
   { word: 'しつこい', hint: '「5回同じ質問をした」のように回数で' },
   { word: 'ぐずる', hint: '本人の言葉・行動で' },
   { word: 'さぼ', hint: '本人の言葉・行動で' },
+  { word: 'お漏らし', hint: '「失禁」と書き、量と時刻を書く' },
+  { word: 'おもらし', hint: '「失禁」と書き、量と時刻を書く' },
+  { word: 'だらしな', hint: '職員の評価は書かない。見た事実を書く' },
+  { word: '年だから', hint: '年齢のせいにしない。いつ・何が起きたかを書く' },
   { word: '悪い', hint: '評価ではなく事実を' },
 ];
 
@@ -105,13 +109,14 @@ export function checkSoap(soap: Soap, category?: CategoryDef): Finding[] {
   for (const w of findAll(stripQuotes(soap.s), SPECULATION)) {
     f.push({ code: 'speculation', severity: 'warn', part: 'S', match: w, message: `S は本人の言葉をそのまま書く欄です。「${w}」のような職員の推測は A へ。` });
   }
+  // 「」の中は本人の言葉そのもの（「少し痛い」「うるさい」と言ったなら、そのまま書くのが正しい）
   for (const { word, hint } of VAGUE) {
-    if (toHalf(soap.o).includes(word)) {
+    if (toHalf(stripQuotes(soap.o)).includes(word)) {
       f.push({ code: 'vague', severity: 'warn', part: 'O', match: word, message: `「${word}」はあいまいな表現です。`, suggestion: hint });
     }
   }
   for (const { word, hint } of LABELS) {
-    const where = (['s', 'o', 'a', 'p'] as const).find((k) => toHalf(soap[k]).includes(word));
+    const where = (['s', 'o', 'a', 'p'] as const).find((k) => toHalf(stripQuotes(soap[k])).includes(word));
     if (where) {
       f.push({ code: 'label', severity: 'error', part: where.toUpperCase(), match: word, message: `「${word}」は利用者の尊厳を傷つける・ラベルを貼る表現です。`, suggestion: hint });
     }
@@ -174,6 +179,14 @@ const numEq = (a: string, b: string | number, tol = 0) => {
   return Math.abs(x - y) <= tol + 1e-9;
 };
 
+/** 自由に書く欄（場所など）は、「食堂にて」「2階の廊下」のような書き方の違いを許す */
+const textEq = (actual: string, expected: string) => {
+  const norm = (x: string) => toHalf(x).replace(/\s|にて|で$|の/g, '');
+  const a = norm(actual);
+  const e = norm(expected);
+  return !!a && (a.includes(e) || e.includes(a));
+};
+
 /** 場面モード：入力項目・要点・SOAP の質を合わせて採点する */
 export function evaluate(entry: RecordEntry, scenario: Scenario | undefined, category: CategoryDef): CheckResult {
   const findings = checkSoap(entry.soap, category);
@@ -188,7 +201,9 @@ export function evaluate(entry: RecordEntry, scenario: Scenario | undefined, cat
       const ok =
         def?.type === 'number'
           ? numEq(actual, exp.value, exp.tolerance ?? 0)
-          : toHalf(actual).trim() === toHalf(String(exp.value)).trim();
+          : def?.type === 'text' || def?.type === 'textarea'
+            ? textEq(actual, String(exp.value))
+            : toHalf(actual).trim() === toHalf(String(exp.value)).trim();
       fieldHits.push({ id, label: def?.label ?? id, ok, expected: fmtExpected(exp.value) + (def?.unit ?? ''), actual });
     }
     const all = `${entry.soap.s}\n${entry.soap.o}\n${entry.soap.a}\n${entry.soap.p}`;

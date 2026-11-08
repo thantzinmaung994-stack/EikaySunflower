@@ -74,3 +74,23 @@ describe('quoted resident words', () => {
     expect(f.some((x) => x.part === 'S' && x.code === 'speculation')).toBe(true);
   });
 });
+
+describe('resident words and free-text fields', () => {
+  it('does not flag vague words or labels inside 「」', () => {
+    const f = checkSoap({ s: '「少し痛い。うるさいなあ」', o: '10:00 居室で「少し痛い」「うるさいなあ」と話した。', a: '痛みの可能性がある', p: '看護師に報告する' });
+    expect(f.filter((x) => x.code === 'vague' || x.code === 'label')).toEqual([]);
+  });
+  it('flags new labels written by staff', () => {
+    const f = checkSoap({ s: '（特になし）', o: '10:00 お漏らしあり。年だから仕方ない。', a: '可能性がある', p: '観察する' });
+    expect(f.filter((x) => x.code === 'label').map((x) => x.match)).toEqual(['お漏らし', '年だから']);
+  });
+  it('accepts small differences in free-text fields', async () => {
+    const { SCENARIOS } = await import('../data/scenarios');
+    const sc = SCENARIOS.find((s) => s.id === 'behavior-01')!;
+    const base = entryFor(sc);
+    const r = evaluate({ ...base, fields: { ...base.fields, place: '2階の廊下にて' } }, sc, categoryById(sc.category));
+    expect(r.fieldHits.find((h) => h.id === 'place')?.ok).toBe(true);
+    const r2 = evaluate({ ...base, fields: { ...base.fields, place: '食堂' } }, sc, categoryById(sc.category));
+    expect(r2.fieldHits.find((h) => h.id === 'place')?.ok).toBe(false);
+  });
+});
