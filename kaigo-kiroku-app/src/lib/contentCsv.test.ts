@@ -62,3 +62,14 @@ describe('content/*.csv', () => {
     ]);
   });
 });
+
+describe('glossary data', () => {
+  it('every term has a known group, a kana reading and is unique', async () => {
+    const { GLOSSARY, GLOSSARY_GROUPS } = await import('../data/glossary');
+    const groups = new Set<string>(GLOSSARY_GROUPS);
+    const bad = GLOSSARY.filter((g) => !groups.has(g.group) || !/^[ぁ-ゟ゠-ヿー・]+$/.test(g.yomi) || !g.meaning);
+    expect(bad.map((g) => g.term)).toEqual([]);
+    const terms = GLOSSARY.map((g) => g.term);
+    expect(new Set(terms).size).toBe(terms.length);
+  });
+});

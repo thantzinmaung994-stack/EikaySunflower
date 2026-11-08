@@ -83,6 +83,7 @@ const T = {
     searchPh: '漢字・ひらがな・ミャンマー語で検索',
     terms: '語',
     noMatch: '見つかりませんでした',
+    showMore: 'もっと見る',
     settings: '設定',
     furigana: 'ふりがな',
     dailyGoal: '1日の目標（場面）',

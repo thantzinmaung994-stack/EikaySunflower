@@ -1,4 +1,5 @@
 import contentCsv from '../../content/glossary.csv?raw';
+import TERMS from './glossary-terms.json';
 import { CONTENT_ERRORS, parseGlossary } from '../lib/contentCsv';
 /**
  * 介護記録の用語辞典
@@ -6,17 +7,31 @@ import { CONTENT_ERRORS, parseGlossary } from '../lib/contentCsv';
  * - ミャンマー語訳は translations/myanmar.csv（key: glossary.<term>）
  * - example: 事実で書いた記録の例（数字・時刻を入れる）
  */
-export type GlossaryGroup =
-  | '記録の基本'
-  | 'バイタル・身体'
-  | '食事・水分'
-  | '排泄'
-  | '入浴・清潔'
-  | '移動・体位'
-  | '認知症・こころ'
-  | '医療・薬'
-  | '安全・事故'
-  | '略語';
+/** 介護福祉士国家試験の科目に合わせたグループ（この順で表示する） */
+export const GLOSSARY_GROUPS = [
+  '記録の基本',
+  '人間の尊厳と自立・介護の基本',
+  '介護過程・チームケア',
+  '社会の理解（制度・法律）',
+  'コミュニケーション',
+  'こころとからだのしくみ',
+  'バイタル・身体',
+  '発達と老化',
+  '認知症',
+  '障害の理解',
+  '医療的ケア・病気・薬',
+  '食事・水分',
+  '排泄',
+  '入浴・清潔',
+  '移動・体位',
+  '家事・住環境・福祉用具',
+  '安全・事故',
+  '感染対策',
+  '現場のことば',
+  '略語',
+] as const;
+
+export type GlossaryGroup = (typeof GLOSSARY_GROUPS)[number];
 
 export interface GlossaryTerm {
   term: string;
@@ -25,19 +40,6 @@ export interface GlossaryTerm {
   example?: string;
   group: GlossaryGroup;
 }
-
-export const GLOSSARY_GROUPS: GlossaryGroup[] = [
-  '記録の基本',
-  'バイタル・身体',
-  '食事・水分',
-  '排泄',
-  '入浴・清潔',
-  '移動・体位',
-  '認知症・こころ',
-  '医療・薬',
-  '安全・事故',
-  '略語',
-];
 
 const BUILTIN: GlossaryTerm[] = [
   // ───────── 記録の基本 ─────────
@@ -778,97 +780,97 @@ const BUILTIN: GlossaryTerm[] = [
     term: '認知症',
     yomi: 'にんちしょう',
     meaning: '脳の病気で、記憶や判断する力が低下し、生活に困ることが出てくる状態。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '帰宅願望',
     yomi: 'きたくがんぼう',
     meaning: '施設にいる人が「家に帰りたい」と強く思うこと。夕方に多い。',
     example: '16時、玄関で「家に帰ります」と話し、靴をはこうとした。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '見当識障害',
     yomi: 'けんとうしきしょうがい',
     meaning: '今がいつか、ここがどこか、相手がだれかがわからなくなること。',
     example: '「今は朝ですか」と14時に3回質問した。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: 'せん妄',
     yomi: 'せんもう',
     meaning: '急に意識が混乱した状態。夜に多く、体調の変化が原因のこともある。',
     example: '2時、「虫がいる」と大きな声で話し、点滴の管を触った。看護師に報告した。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '徘徊',
     yomi: 'はいかい',
     meaning: 'あちこち歩き回ること。記録では「徘徊」というラベルではなく、具体的な行動を書く。',
     example: '1時から1時40分まで、廊下を往復して歩いた。声をかけると「トイレを探している」と話した。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '物盗られ妄想',
     yomi: 'ものとられもうそう',
     meaning: '自分で置き忘れたものを、「だれかに盗られた」と思いこむこと。',
     example: '10時、「財布を盗られた」と話した。一緒に探し、10時15分にタンスの中で見つかった。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '幻覚',
     yomi: 'げんかく',
     meaning: '実際にはないものが、見えたり聞こえたりすること。',
     example: '20時、壁を指さして「子どもが立っている」と話した。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '不穏',
     yomi: 'ふおん',
     meaning: '落ち着かず、興奮したり動き回ったりする状態。記録では具体的な行動を書く。',
     example: '21時、ベッドの柵を両手でたたき、「出して」と5回大きな声で言った。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '介護拒否',
     yomi: 'かいごきょひ',
     meaning: '入浴や食事などの介護をいやがって受けないこと。',
     example: '14時、入浴に誘うと「今日は入らない」と話した。15時に再度誘ったが同様だった。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '不眠',
     yomi: 'ふみん',
     meaning: '夜に眠れないこと。',
     example: '23時から3時まで、巡視のたびに開眼しており、「眠れない」と話した。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '中途覚醒',
     yomi: 'ちゅうとかくせい',
     meaning: '夜中に何度も目がさめること。',
     example: '1時と3時に中途覚醒あり。トイレ誘導後、再入眠した。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '昼夜逆転',
     yomi: 'ちゅうやぎゃくてん',
     meaning: '昼に眠り、夜に起きているようになること。',
     example: '日中10時から15時まで居室で閉眼しており、夜間は0時から4時まで起きていた。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '傾聴',
     yomi: 'けいちょう',
     meaning: '相手の話を、気持ちを大切にしながら、よく聞くこと。',
     example: '15時から15分間、居室で家族の話を傾聴した。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
   {
     term: '興奮',
     yomi: 'こうふん',
     meaning: '気持ちが高ぶって、落ち着かない状態。',
-    group: '認知症・こころ',
+    group: '認知症',
   },
 
   // ───────── 医療・薬 ─────────
@@ -877,106 +879,106 @@ const BUILTIN: GlossaryTerm[] = [
     yomi: 'ふくやく',
     meaning: '薬を飲むこと。飲み込んだところまで確認する。',
     example: '8時、朝食後の薬を服薬。口の中に残っていないことを確認した。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '内服',
     yomi: 'ないふく',
     meaning: '薬を口から飲むこと。飲み薬。',
     example: '19時、夕食後の内服薬3錠を服薬した。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '頓服',
     yomi: 'とんぷく',
     meaning: '熱や痛みなどがあるときだけ使う薬。',
     example: '15時、体温38.3℃のため、看護師が頓服の解熱剤を与薬した。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '与薬',
     yomi: 'よやく',
     meaning: '利用者に薬を渡したり、飲ませたりすること。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '落薬',
     yomi: 'らくやく',
     meaning: '薬を飲むときに、床などに落としてしまうこと。',
     example: '12時30分、テーブルの下に白い錠剤1錠の落薬を発見し、看護師に報告した。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '誤薬',
     yomi: 'ごやく',
     meaning: 'ちがう人の薬、ちがう時間の薬、ちがう量を飲ませてしまうこと。',
     example: '8時10分、E様の薬をF様に渡したことに気づき、すぐに看護師に報告した。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '外用薬',
     yomi: 'がいようやく',
     meaning: '塗り薬、貼り薬、目薬など、体の外から使う薬。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '軟膏',
     yomi: 'なんこう',
     meaning: '皮膚に塗る、やわらかい薬。',
     example: '入浴後、背部の発赤部に軟膏を塗布した。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '湿布',
     yomi: 'しっぷ',
     meaning: '皮膚に貼る薬。',
     example: '9時、右膝の湿布を貼りかえた。皮膚に発赤なし。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '点眼',
     yomi: 'てんがん',
     meaning: '目薬をさすこと。',
     example: '10時、両眼に1滴ずつ点眼した。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '吸引',
     yomi: 'きゅういん',
     meaning: '口や鼻、のどにたまった痰を機械で吸い取ること。',
     example: '6時、ゴロゴロ音があり、看護師が吸引を行った。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '受診',
     yomi: 'じゅしん',
     meaning: '病院などで医師にみてもらうこと。',
     example: '10時、家族付き添いで整形外科を受診した。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '主治医',
     yomi: 'しゅじい',
     meaning: 'その人の病気を中心になってみている医師。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '既往歴',
     yomi: 'きおうれき',
     meaning: '今までにかかった病気やけがの記録。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '感染症',
     yomi: 'かんせんしょう',
     meaning: 'ウイルスや細菌が体に入って起こる病気。インフルエンザ、ノロウイルスなど。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
   {
     term: '手指消毒',
     yomi: 'しゅししょうどく',
     meaning: 'アルコールなどで手や指を消毒すること。感染を防ぐ。',
-    group: '医療・薬',
+    group: '医療的ケア・病気・薬',
   },
 
   // ───────── 安全・事故 ─────────
@@ -1150,5 +1152,9 @@ const BUILTIN: GlossaryTerm[] = [
 ];
 
 /** 組み込みの用語 ＋ 講師が content/glossary.csv に書いた用語 */
-export const CSV_GLOSSARY: GlossaryTerm[] = parseGlossary(contentCsv, new Set(BUILTIN.map((g) => g.term)), GLOSSARY_GROUPS, CONTENT_ERRORS);
-export const GLOSSARY: GlossaryTerm[] = [...BUILTIN, ...CSV_GLOSSARY];
+/** 試験科目ごとに追加した用語（glossary-terms.json。term・yomi・group・meaning・example） */
+const MORE = TERMS as GlossaryTerm[];
+
+const BASE = [...BUILTIN, ...MORE];
+export const CSV_GLOSSARY: GlossaryTerm[] = parseGlossary(contentCsv, new Set(BASE.map((g) => g.term)), GLOSSARY_GROUPS, CONTENT_ERRORS);
+export const GLOSSARY: GlossaryTerm[] = [...BASE, ...CSV_GLOSSARY];
