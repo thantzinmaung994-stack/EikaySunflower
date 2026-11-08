@@ -11,6 +11,8 @@ import { Learn } from './screens/Learn';
 import { PracticeList } from './screens/PracticeList';
 import { RecordEditor } from './screens/RecordEditor';
 import { InfoView, SettingsScreen } from './screens/SettingsScreen';
+import { Premium } from './screens/Premium';
+import { initPremium, isFreeScenario, previewToggleEnabled } from './lib/premium';
 import type { CategoryId, QuizResult, RecordEntry } from './types';
 import logoMark from './assets/logo-mark.png';
 
@@ -20,9 +22,11 @@ type View =
   | { kind: 'scenario'; id: string }
   | { kind: 'free'; cat?: CategoryId }
   | { kind: 'settings' }
+  | { kind: 'premium' }
   | { kind: 'info'; id: InfoPage['id'] };
 
 const QUIZ_KEY = 'kaigo-kiroku:quizzes';
+const PREVIEW_KEY = 'kaigo-kiroku:preview-premium';
 
 export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -30,6 +34,8 @@ export default function App() {
   const [quizzes, setQuizzes] = useState<QuizResult[]>([]);
   const [view, setView] = useState<View>({ kind: 'tab', tab: 'home' });
   const [loaded, setLoaded] = useState(false);
+  const [premium, setPremium] = useState(false);
+  const [backTo, setBackTo] = useState<View>({ kind: 'settings' });
   const lang = settings.lang;
 
   useEffect(() => {
@@ -38,11 +44,14 @@ export default function App() {
       setRecords(r);
       setQuizzes(q);
       setSettings(s);
+      if (previewToggleEnabled()) setPremium(await loadJson<boolean>(PREVIEW_KEY, false));
       setLoaded(true);
+      void initPremium(setPremium);
     })();
   }, []);
 
   const go = (v: View) => {
+    if (v.kind === 'premium' || v.kind === 'info') setBackTo(view.kind === 'premium' || view.kind === 'info' ? backTo : view);
     setView(v);
     window.scrollTo(0, 0);
   };
@@ -76,6 +85,11 @@ export default function App() {
     });
   };
 
+  const togglePreview = (on: boolean) => {
+    setPremium(on);
+    void saveJson(PREVIEW_KEY, on);
+  };
+
   const clearData = async () => {
     await clearAll();
     setRecords([]);
@@ -97,15 +111,19 @@ export default function App() {
 
   let body: JSX.Element | null = null;
   if (!loaded) body = null;
-  else if (view.kind === 'scenario') {
+  else if (view.kind === 'scenario' && !premium && !isFreeScenario({ id: view.id })) {
+    body = <Premium lang={lang} premium={premium} onPreviewToggle={togglePreview} onOpenInfo={(id) => go({ kind: 'info', id })} onBack={() => go({ kind: 'tab', tab: 'practice' })} />;
+  } else if (view.kind === 'scenario') {
     body = <RecordEditor key={view.id} lang={lang} scenario={scenarioById(view.id)} onSave={upsert} onExit={() => go({ kind: 'tab', tab: 'history' })} />;
   } else if (view.kind === 'free') {
     body = <RecordEditor key={`free-${view.cat ?? ''}`} lang={lang} initialCategory={view.cat} onSave={upsert} onExit={() => go({ kind: 'tab', tab: 'history' })} />;
   } else if (view.kind === 'settings') {
-    body = <SettingsScreen settings={settings} onChange={updateSettings} onOpenInfo={(id) => go({ kind: 'info', id })} onClearData={clearData} />;
+    body = <SettingsScreen settings={settings} onChange={updateSettings} onOpenInfo={(id) => go({ kind: 'info', id })} onClearData={clearData} premium={premium} onOpenPremium={() => go({ kind: 'premium' })} />;
+  } else if (view.kind === 'premium') {
+    body = <Premium lang={lang} premium={premium} onPreviewToggle={togglePreview} onOpenInfo={(id) => go({ kind: 'info', id })} onBack={() => go(backTo)} />;
   } else if (view.kind === 'info') {
     const page = INFO_PAGES.find((p) => p.id === view.id)!;
-    body = <InfoView page={page} onBack={() => go({ kind: 'settings' })} backLabel={t(lang, 'back')} />;
+    body = <InfoView page={page} onBack={() => go(backTo)} backLabel={t(lang, 'back')} />;
   } else if (view.tab === 'home') {
     body = (
       <Home
@@ -113,6 +131,7 @@ export default function App() {
         records={records}
         quizzes={quizzes}
         dailyGoal={settings.dailyGoal}
+        premium={premium}
         onScenario={(id) => go({ kind: 'scenario', id })}
         onQuiz={() => go({ kind: 'tab', tab: 'quiz' })}
         onFree={(cat) => go({ kind: 'free', cat })}
@@ -120,7 +139,7 @@ export default function App() {
       />
     );
   } else if (view.tab === 'practice') {
-    body = <PracticeList lang={lang} records={records} onSelect={(id) => go({ kind: 'scenario', id })} onFree={() => go({ kind: 'free' })} />;
+    body = <PracticeList lang={lang} records={records} onSelect={(id) => go({ kind: 'scenario', id })} onFree={() => go({ kind: 'free' })} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
   } else if (view.tab === 'quiz') {
     body = <FactQuiz lang={lang} quizzes={quizzes} onFinish={addQuiz} />;
   } else if (view.tab === 'history') {
@@ -141,7 +160,7 @@ export default function App() {
             <button className="lang-toggle" onClick={() => updateSettings({ ...settings, lang: lang === 'ja' ? 'my' : 'ja' })} aria-label={t(lang, 'language')}>
               {lang === 'ja' ? 'မြန်မာ' : '日本語'}
             </button>
-            <button className={`icon-btn${view.kind === 'settings' || view.kind === 'info' ? ' on' : ''}`} onClick={() => go({ kind: 'settings' })} aria-label={t(lang, 'settings')}>
+            <button className={`icon-btn${view.kind === 'settings' || view.kind === 'info' || view.kind === 'premium' ? ' on' : ''}`} onClick={() => go({ kind: 'settings' })} aria-label={t(lang, 'settings')}>
               ⚙️
             </button>
           </div>

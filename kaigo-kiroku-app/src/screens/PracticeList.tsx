@@ -3,6 +3,7 @@ import { Ruby } from '../components/Ruby';
 import { CATEGORIES, categoryById, catName } from '../data/categories';
 import { SCENARIOS } from '../data/scenarios';
 import { t } from '../i18n';
+import { isFreeScenario } from '../lib/premium';
 import type { CategoryId, Lang, RecordEntry } from '../types';
 
 interface Props {
@@ -10,11 +11,13 @@ interface Props {
   records: RecordEntry[];
   onSelect: (id: string) => void;
   onFree: () => void;
+  premium: boolean;
+  onLocked: () => void;
 }
 
 const grade = (s: number) => (s >= 80 ? 'good' : s >= 50 ? 'mid' : 'low');
 
-export function PracticeList({ lang, records, onSelect, onFree }: Props) {
+export function PracticeList({ lang, records, onSelect, onFree, premium, onLocked }: Props) {
   const [filter, setFilter] = useState<CategoryId | 'all'>('all');
   const list = SCENARIOS.filter((s) => filter === 'all' || s.category === filter);
   const best = (id: string) =>
@@ -41,8 +44,9 @@ export function PracticeList({ lang, records, onSelect, onFree }: Props) {
       {list.map((s) => {
         const c = categoryById(s.category);
         const b = best(s.id);
+        const locked = !premium && !isFreeScenario(s);
         return (
-          <button key={s.id} className="list-item" onClick={() => onSelect(s.id)}>
+          <button key={s.id} className={`list-item${locked ? ' locked' : ''}`} onClick={() => (locked ? onLocked() : onSelect(s.id))}>
             <span className="ico">{c.icon}</span>
             <div className="body">
               <b><Ruby text={s.title} /></b>
@@ -51,7 +55,7 @@ export function PracticeList({ lang, records, onSelect, onFree }: Props) {
                 {s.resident}
               </div>
             </div>
-            {b !== undefined ? <div className={`score-pill ${grade(b)}`}>{b}</div> : <div className="score-pill muted">›</div>}
+            {locked ? <span className="lock-badge">🔒 {t(lang, 'locked')}</span> : b !== undefined ? <div className={`score-pill ${grade(b)}`}>{b}</div> : <div className="score-pill muted">›</div>}
           </button>
         );
       })}

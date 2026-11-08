@@ -65,10 +65,11 @@ export function categoryProgress(records: RecordEntry[]) {
 }
 
 /** 今日の場面：まだできていない場面から、日付で決まる1本（同じ日は同じ場面） */
-export function todaysScenario(records: RecordEntry[], today = new Date()): Scenario {
+export function todaysScenario(records: RecordEntry[], today = new Date(), allowed: (s: Scenario) => boolean = () => true): Scenario {
   const best = bestScores(records);
-  const pool = SCENARIOS.filter((s) => (best.get(s.id) ?? 0) < MASTERY);
-  const list = pool.length ? pool : SCENARIOS;
+  const open = SCENARIOS.filter(allowed);
+  const pool = open.filter((s) => (best.get(s.id) ?? 0) < MASTERY);
+  const list = pool.length ? pool : open.length ? open : SCENARIOS;
   const seed = Number(dayKey(today).replace(/-/g, ''));
   return list[seed % list.length];
 }

@@ -9,11 +9,13 @@ interface Props {
   onChange: (s: Settings) => void;
   onOpenInfo: (id: InfoPage['id']) => void;
   onClearData: () => void;
+  premium: boolean;
+  onOpenPremium: () => void;
 }
 
 const pad = (n: number) => String(n).padStart(2, '0');
 
-export function SettingsScreen({ settings, onChange, onOpenInfo, onClearData }: Props) {
+export function SettingsScreen({ settings, onChange, onOpenInfo, onClearData, premium, onOpenPremium }: Props) {
   const lang = settings.lang;
   const [confirmClear, setConfirmClear] = useState(false);
   const [reminderMsg, setReminderMsg] = useState('');
@@ -87,6 +89,12 @@ export function SettingsScreen({ settings, onChange, onOpenInfo, onClearData }: 
           </>
         )}
       </div>
+
+      <button className="list-item premium-row" onClick={onOpenPremium}>
+        <span className="ico">⭐</span>
+        <div className="body"><b>{t(lang, 'premium')}</b><div className="meta">{premium ? t(lang, 'youArePremium') : t(lang, 'premiumTitle')}</div></div>
+        <span className="muted">›</span>
+      </button>
 
       <div className="card">
         <h2>{t(lang, 'appInfo')}</h2>

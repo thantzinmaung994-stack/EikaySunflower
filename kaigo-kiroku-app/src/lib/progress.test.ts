@@ -65,3 +65,20 @@ describe('review and missed quiz items', () => {
     expect(b.id).not.toBe(a.id);
   });
 });
+
+describe('free plan', () => {
+  it('has exactly one free scenario per record type', async () => {
+    const { SCENARIOS } = await import('../data/scenarios');
+    const { CATEGORIES } = await import('../data/categories');
+    const { isFreeScenario } = await import('./premium');
+    const free = SCENARIOS.filter(isFreeScenario);
+    expect(free.length).toBe(CATEGORIES.length);
+    expect(new Set(free.map((s) => s.category)).size).toBe(CATEGORIES.length);
+  });
+  it("today's scenario stays inside the free plan when not subscribed", async () => {
+    const { isFreeScenario } = await import('./premium');
+    for (let d = 1; d <= 30; d++) {
+      expect(isFreeScenario(todaysScenario([], new Date(2026, 10, d), isFreeScenario))).toBe(true);
+    }
+  });
+});

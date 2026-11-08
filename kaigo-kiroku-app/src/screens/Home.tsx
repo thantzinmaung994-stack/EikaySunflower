@@ -6,6 +6,7 @@ import {
   activeDays, categoryProgress, dayKey, lastWeek, MASTERY, reviewScenarios, streak, todaysScenario, weakPoints,
 } from '../lib/progress';
 import type { CategoryId, Lang, QuizResult, RecordEntry } from '../types';
+import { isFreeScenario } from '../lib/premium';
 import logoFull from '../assets/logo-full.png';
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
   records: RecordEntry[];
   quizzes: QuizResult[];
   dailyGoal: number;
+  premium: boolean;
   onScenario: (id: string) => void;
   onQuiz: () => void;
   onFree: (cat?: CategoryId) => void;
@@ -21,7 +23,7 @@ interface Props {
 
 const grade = (s: number) => (s >= MASTERY ? 'good' : s >= 50 ? 'mid' : 'low');
 
-export function Home({ lang, records, quizzes, dailyGoal, onScenario, onQuiz, onFree, onPractice }: Props) {
+export function Home({ lang, records, quizzes, dailyGoal, premium, onScenario, onQuiz, onFree, onPractice }: Props) {
   const days = activeDays(records, quizzes);
   const st = streak(days);
   const week = lastWeek(days);
@@ -29,7 +31,7 @@ export function Home({ lang, records, quizzes, dailyGoal, onScenario, onQuiz, on
   const doneScenes = records.filter((r) => dayKey(r.createdAt) === today).length;
   const doneQuiz = quizzes.some((q) => dayKey(q.createdAt) === today);
   const goalMet = doneScenes >= dailyGoal && doneQuiz;
-  const todays = todaysScenario(records);
+  const todays = todaysScenario(records, new Date(), (s) => premium || isFreeScenario(s));
   const review = reviewScenarios(records).slice(0, 3);
   const weak = weakPoints(records);
   const progress = categoryProgress(records);
