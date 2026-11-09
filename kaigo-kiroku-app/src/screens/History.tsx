@@ -2,24 +2,27 @@ import { useState } from 'react';
 import { categoryById, catName } from '../data/categories';
 import { scenarioById } from '../data/scenarios';
 import { t } from '../i18n';
-import type { Lang, RecordEntry } from '../types';
+import { StatsPanel } from '../components/StatsPanel';
+import type { Lang, QuizResult, RecordEntry } from '../types';
 
 interface Props {
   lang: Lang;
   records: RecordEntry[];
+  quizzes: QuizResult[];
   onDelete: (id: string) => void;
 }
 
 const grade = (s: number) => (s >= 80 ? 'good' : s >= 50 ? 'mid' : 'low');
 
-export function History({ lang, records, onDelete }: Props) {
+export function History({ lang, records, quizzes, onDelete }: Props) {
   const [openId, setOpenId] = useState<string | null>(null);
   // ブラウザの confirm() は WebView や埋め込み表示で使えないことがあるので、2回タップで削除する
   const [confirmId, setConfirmId] = useState<string | null>(null);
-  if (records.length === 0) return <div className="empty">{t(lang, 'noRecords')}</div>;
+  if (records.length === 0 && quizzes.length === 0) return <div className="empty">{t(lang, 'noRecords')}</div>;
 
   return (
     <>
+      <StatsPanel lang={lang} records={records} quizzes={quizzes} />
       {records.map((r) => {
         const c = categoryById(r.category);
         const sc = r.scenarioId ? scenarioById(r.scenarioId) : undefined;

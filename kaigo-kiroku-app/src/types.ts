@@ -115,6 +115,8 @@ export type FindingCode =
 /** ミニクイズ1回分の結果 */
 export interface QuizResult {
   id: string;
+  /** クイズの種類（なし＝事実？解釈？） */
+  kind?: string;
   createdAt: string;
   total: number;
   correct: number;

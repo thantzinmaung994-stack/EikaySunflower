@@ -13,14 +13,17 @@
     "cap:ios": "npm run cap:sync && cap open ios",
     "cap:android": "npm run cap:sync && cap open android",
     "my:sync": "vite-node scripts/sync-myanmar.mts",
-    "content:check": "vite-node scripts/check-content.mts"
+    "content:check": "vite-node scripts/check-content.mts",
+    "site": "vite-node scripts/build-site.mts"
   },
   "dependencies": {
     "@capacitor/android": "^8.5.3",
     "@capacitor/core": "^8.5.3",
+    "@capacitor/filesystem": "8.1.5",
     "@capacitor/ios": "^8.5.3",
     "@capacitor/local-notifications": "^8.3.1",
     "@capacitor/preferences": "^8.0.1",
+    "@capacitor/share": "8.0.3",
     "@revenuecat/purchases-capacitor": "13.7.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"

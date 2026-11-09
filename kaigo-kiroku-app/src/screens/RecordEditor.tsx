@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FieldInput } from '../components/FieldInput';
 import { Ruby } from '../components/Ruby';
+import { Speak } from '../components/Speak';
 import { ResultPanel } from '../components/ResultPanel';
 import { CATEGORIES, categoryById, catName } from '../data/categories';
 import { t } from '../i18n';
@@ -107,7 +108,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
 
       {step === 'scene' && scenario && (
         <div className="card">
-          <h2>{t(lang, 'scene')}</h2>
+          <h2 className="row-between">{t(lang, 'scene')} <Speak text={scenario.story} /></h2>
           <div className="muted" style={{ marginBottom: 6 }}>{t(lang, 'resident')}: {scenario.resident}</div>
           <div className="story"><Ruby text={scenario.story} /></div>
           {lang === 'my' && my(`scenario.${scenario.id}.story`) && <div className="story-my">{my(`scenario.${scenario.id}.story`)}</div>}

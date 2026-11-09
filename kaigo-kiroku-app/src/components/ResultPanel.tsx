@@ -4,6 +4,7 @@ import type { Lang, Scenario } from '../types';
 import { t } from '../i18n';
 import { my } from '../lib/myanmar';
 import { Ruby } from './Ruby';
+import { Speak } from './Speak';
 
 interface Props {
   result: CheckResult;
@@ -110,7 +111,7 @@ export function ResultPanel({ result, scenario, lang }: Props) {
                 <dt>Why</dt><dd><Ruby text={scenario.model.w.why} /></dd>
                 <dt>How</dt><dd><Ruby text={scenario.model.w.how} /></dd>
               </dl>
-              <h3>SOAP</h3>
+              <h3 className="row-between">SOAP <Speak text={`${scenario.model.soap.s}。${scenario.model.soap.o}。${scenario.model.soap.a}。${scenario.model.soap.p}`} /></h3>
               <dl className="model">
                 <dt>S</dt><dd><Ruby text={scenario.model.soap.s} /></dd>
                 <dt>O</dt><dd><Ruby text={scenario.model.soap.o} /></dd>

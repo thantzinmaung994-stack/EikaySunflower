@@ -10,6 +10,8 @@ export interface Settings {
   reminder: { on: boolean; hour: number; minute: number };
   /** 1日の目標（場面の数） */
   dailyGoal: number;
+  /** 読み上げの速さ（0.7＝ゆっくり、0.9＝ふつう） */
+  speechRate: number;
   /** 初回の使い方を見たか */
   onboarded: boolean;
 }
@@ -19,6 +21,7 @@ export const DEFAULT_SETTINGS: Settings = {
   furigana: true,
   reminder: { on: false, hour: 20, minute: 0 },
   dailyGoal: 1,
+  speechRate: 0.9,
   onboarded: false,
 };
 

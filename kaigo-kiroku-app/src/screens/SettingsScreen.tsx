@@ -1,5 +1,7 @@
 import { useState } from 'react';
+import { BackupPanel } from '../components/BackupPanel';
 import { INFO_PAGES, type InfoPage } from '../data/info';
+import { speechSupported } from '../lib/speech';
 import { t } from '../i18n';
 import { applyReminder, remindersSupported } from '../lib/reminder';
 import type { Settings } from '../lib/settings';
@@ -52,6 +54,18 @@ export function SettingsScreen({ settings, onChange, onOpenInfo, onClearData, pr
             <button className={!settings.furigana ? 'on' : ''} onClick={() => onChange({ ...settings, furigana: false })}>OFF</button>
           </div>
         </div>
+        {speechSupported() && (
+          <div className="setting-row">
+            <span>🔊 {t(lang, 'speechRate')}</span>
+            <div className="seg">
+              {([[0.7, 'slow'], [0.9, 'normal']] as const).map(([r, k]) => (
+                <button key={k} className={settings.speechRate === r ? 'on' : ''} onClick={() => onChange({ ...settings, speechRate: r })}>
+                  {t(lang, k === 'slow' ? 'speechSlow' : 'speechNormal')}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
         <div className="setting-row">
           <span>🎯 {t(lang, 'dailyGoal')}</span>
           <div className="seg">
@@ -106,6 +120,8 @@ export function SettingsScreen({ settings, onChange, onOpenInfo, onClearData, pr
           </button>
         ))}
       </div>
+
+      <BackupPanel lang={lang} />
 
       <div className="card">
         <h2>{t(lang, 'data')}</h2>

@@ -235,3 +235,45 @@ a.btn { text-decoration: none; }
 .lock-note { display: block; width: 100%; text-align: left; border: 1px dashed var(--gold); background: var(--gold-soft); color: var(--gold-text); border-radius: 10px; padding: 8px 10px; font-size: 13px; font-weight: 700; margin-bottom: 10px; }
 .locked-terms { text-align: center; border-style: dashed; border-color: var(--gold); background: var(--gold-soft); }
 .locked-terms .preview { color: var(--muted); font-size: 13px; margin: 4px 0 8px; }
+
+/* ---- 読み上げ・お気に入り ---- */
+.speak, .fav { border: 1px solid var(--line); background: #fff; border-radius: 999px; min-width: 36px; height: 36px; font-size: 16px; line-height: 1; padding: 0 8px; }
+.speak.on { border-color: var(--gold); background: var(--gold-soft); }
+.fav { color: var(--gold-deep); font-size: 18px; }
+.fav.on { border-color: var(--gold); background: var(--gold-soft); }
+.term-actions { margin-left: auto; display: inline-flex; gap: 6px; }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+
+/* ---- クイズメニュー・選択式 ---- */
+.list-item.mode .meta + .meta { margin-top: 2px; color: var(--gold-text); }
+.choice-list { display: grid; gap: 8px; }
+.choice-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.quiz-btn.choice { width: 100%; text-align: left; justify-content: flex-start; font-weight: 600; font-size: 15px; line-height: 1.7; padding: 10px 12px; white-space: normal; }
+.choice-grid .quiz-btn.choice { justify-content: center; text-align: center; }
+.quiz-btn.dim { opacity: .55; }
+
+/* ---- 用語カード ---- */
+.flashcard { display: block; width: 100%; min-height: 240px; text-align: center; cursor: pointer; border: 2px solid var(--navy); }
+.flashcard.flipped { border-color: var(--gold); cursor: default; }
+.fc-term { font-size: 30px; font-weight: 800; color: var(--navy); margin: 26px 0 10px; display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; }
+.fc-hint { color: var(--muted); margin-top: 30px; font-size: 14px; }
+.fc-back { text-align: left; border-top: 1px dashed var(--line); padding-top: 10px; }
+.fc-back .term-yomi { font-size: 18px; }
+
+/* ---- 成績 ---- */
+.trend { width: 100%; height: auto; display: block; margin: 4px 0 8px; }
+.trend .grid { stroke: var(--line); stroke-width: 1; }
+.trend .goal-line { stroke: var(--gold); stroke-width: 1.5; stroke-dasharray: 4 3; }
+.trend .axis { fill: var(--muted); font-size: 9px; }
+.trend .area { fill: var(--navy-soft); }
+.trend .line { fill: none; stroke: var(--navy); stroke-width: 2; }
+.trend .dot { fill: var(--navy); }
+.trend .dot.last { fill: var(--gold); stroke: var(--navy); stroke-width: 1.5; }
+.week-table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.week-table th, .week-table td { padding: 5px 4px; border-bottom: 1px dashed var(--line); text-align: right; }
+.week-table th[scope=row] { text-align: left; font-weight: 600; }
+.week-table thead th { font-size: 12px; color: var(--muted); }
+.delta { font-size: 12px; width: 44px; }
+.delta.up { color: var(--good); } .delta.down { color: var(--error); }
+.choice-text { display: block; width: 100%; }
+.quiz-btn ruby rt, .btn ruby rt { color: inherit; opacity: .85; }

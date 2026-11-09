@@ -4,7 +4,8 @@ import { scenarioById } from './data/scenarios';
 import { t } from './i18n';
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, SettingsContext, type Settings } from './lib/settings';
 import { clearAll, loadJson, loadLang, loadRecords, saveJson, saveRecords } from './lib/storage';
-import { FactQuiz } from './screens/FactQuiz';
+import { QuizHub } from './screens/QuizHub';
+import { review, StudyContext, type Cards, type Study } from './lib/study';
 import { History } from './screens/History';
 import { Home } from './screens/Home';
 import { Learn } from './screens/Learn';
@@ -27,6 +28,8 @@ type View =
 
 const QUIZ_KEY = 'kaigo-kiroku:quizzes';
 const PREVIEW_KEY = 'kaigo-kiroku:preview-premium';
+const CARDS_KEY = 'kaigo-kiroku:cards';
+const FAV_KEY = 'kaigo-kiroku:favorites';
 
 export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -35,6 +38,8 @@ export default function App() {
   const [view, setView] = useState<View>({ kind: 'tab', tab: 'home' });
   const [loaded, setLoaded] = useState(false);
   const [premium, setPremium] = useState(false);
+  const [cards, setCards] = useState<Cards>({});
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
   const [backTo, setBackTo] = useState<View>({ kind: 'settings' });
   const lang = settings.lang;
 
@@ -44,6 +49,8 @@ export default function App() {
       setRecords(r);
       setQuizzes(q);
       setSettings(s);
+      setCards(await loadJson<Cards>(CARDS_KEY, {}));
+      setFavorites(new Set(await loadJson<string[]>(FAV_KEY, [])));
       if (previewToggleEnabled()) setPremium(await loadJson<boolean>(PREVIEW_KEY, false));
       setLoaded(true);
       void initPremium(setPremium);
@@ -90,10 +97,31 @@ export default function App() {
     void saveJson(PREVIEW_KEY, on);
   };
 
+  const study: Study = {
+    cards,
+    favorites,
+    answerCard: (term, knew) =>
+      setCards((prev) => {
+        const next = { ...prev, [term]: review(prev[term], knew) };
+        void saveJson(CARDS_KEY, next);
+        return next;
+      }),
+    toggleFavorite: (term) =>
+      setFavorites((prev) => {
+        const next = new Set(prev);
+        if (next.has(term)) next.delete(term);
+        else next.add(term);
+        void saveJson(FAV_KEY, [...next]);
+        return next;
+      }),
+  };
+
   const clearData = async () => {
     await clearAll();
     setRecords([]);
     setQuizzes([]);
+    setCards({});
+    setFavorites(new Set());
     // 設定は消さずに残す（言語が急に変わると困るため）
     void saveSettings(settings);
   };
@@ -141,15 +169,16 @@ export default function App() {
   } else if (view.tab === 'practice') {
     body = <PracticeList lang={lang} records={records} onSelect={(id) => go({ kind: 'scenario', id })} onFree={() => go({ kind: 'free' })} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
   } else if (view.tab === 'quiz') {
-    body = <FactQuiz lang={lang} quizzes={quizzes} onFinish={addQuiz} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
+    body = <QuizHub lang={lang} quizzes={quizzes} onFinish={addQuiz} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
   } else if (view.tab === 'history') {
-    body = <History lang={lang} records={records} onDelete={remove} />;
+    body = <History lang={lang} records={records} quizzes={quizzes} onDelete={remove} />;
   } else {
     body = <Learn lang={lang} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
   }
 
   return (
     <SettingsContext.Provider value={settings}>
+      <StudyContext.Provider value={study}>
       <div className="app">
         <header className="header">
           <button className="title" onClick={() => go({ kind: 'tab', tab: 'home' })}>
@@ -175,6 +204,7 @@ export default function App() {
           ))}
         </nav>
       </div>
+      </StudyContext.Provider>
     </SettingsContext.Provider>
   );
 }
