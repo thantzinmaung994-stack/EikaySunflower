@@ -11,20 +11,24 @@
 | バンドルID | com.eikaysunflower.kaigokiroku |
 | SKU | kaigokiroku001 |
 | プライマリカテゴリ | 教育 |
-| セカンダリカテゴリ | 医療 |
+| セカンダリカテゴリ | なし（「メディカル」にすると医療機器の申告が必要になるため） |
 | 価格 | 無料（App 内課金あり） |
+| 配信する国 | 中国本土を除くすべて（アプリ・サブスクとも） |
 | 著作権 | © 2026 EikaySunflower |
 
-## URL（GitHub Pages を有効にしたあとの URL）
+## URL（EikaySunflower のドメイン）
 
 | 項目 | URL |
 | --- | --- |
-| プライバシーポリシー URL | https://thantzinmaung994-stack.github.io/EikaySunflower/kaigo-kiroku/privacy.html |
-| サポート URL | https://thantzinmaung994-stack.github.io/EikaySunflower/kaigo-kiroku/support.html |
-| マーケティング URL（任意） | https://thantzinmaung994-stack.github.io/EikaySunflower/kaigo-kiroku/ |
-| 利用規約（EULA） | https://thantzinmaung994-stack.github.io/EikaySunflower/kaigo-kiroku/terms.html |
+| プライバシーポリシー URL | https://app.eikaysunflower.com/kaigo-kiroku/privacy.html |
+| サポート URL | https://app.eikaysunflower.com/kaigo-kiroku/support.html |
+| マーケティング URL（任意） | https://app.eikaysunflower.com/kaigo-kiroku/ |
+| 利用規約（EULA） | https://app.eikaysunflower.com/kaigo-kiroku/terms.html |
 
-**GitHub Pages の有効化（1回だけ）**：GitHub のリポジトリ →「Settings」→「Pages」→ Source を「Deploy from a branch」、Branch を「main」「/docs」にして Save。数分で上の URL が開けるようになります（このブランチが main にマージされている必要があります）。
+ページは GitHub Pages で公開し、`eikaysunflower.com` のサブドメイン `app.eikaysunflower.com` で表示します（設定は1回だけ）。
+1. Xserver の DNS に CNAME を追加：ホスト名 `app`、内容 `thantzinmaung994-stack.github.io`
+2. GitHub →「Settings」→「Pages」→「Custom domain」に `app.eikaysunflower.com` → Save →「Enforce HTTPS」にチェック
+（`docs/CNAME` はリポジトリに入れてあります）
 
 ## プロモーションテキスト（170文字まで・いつでも変更可）
 
@@ -67,8 +71,8 @@
 ・解約は iPhone の「設定」→ 名前 →「サブスクリプション」からいつでもできます。
 ・スクールの受講生は、受け取ったコードを「受講生コードを使う」から入力してください。
 
-利用規約：https://thantzinmaung994-stack.github.io/EikaySunflower/kaigo-kiroku/terms.html
-プライバシーポリシー：https://thantzinmaung994-stack.github.io/EikaySunflower/kaigo-kiroku/privacy.html
+利用規約：https://app.eikaysunflower.com/kaigo-kiroku/terms.html
+プライバシーポリシー：https://app.eikaysunflower.com/kaigo-kiroku/privacy.html
 
 ※ 場面と人物はすべて架空です。実在の利用者の情報は入力しないでください。
 ※ 自動チェックは学習用の目安です。職場の記録は職場のルールに従ってください。
