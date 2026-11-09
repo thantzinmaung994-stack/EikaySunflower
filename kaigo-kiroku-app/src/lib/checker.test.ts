@@ -1,0 +1,96 @@
+import { describe, expect, it } from 'vitest';
+import { categoryById } from '../data/categories';
+import { SCENARIOS } from '../data/scenarios';
+import type { RecordEntry } from '../types';
+import { checkSoap, evaluate } from './checker';
+
+const entryFor = (sc: (typeof SCENARIOS)[number], over: Partial<RecordEntry> = {}): RecordEntry => ({
+  id: 'x',
+  createdAt: new Date().toISOString(),
+  mode: 'scenario',
+  scenarioId: sc.id,
+  category: sc.category,
+  resident: sc.resident,
+  fields: Object.fromEntries(Object.entries(sc.expected).map(([k, v]) => [k, String(v.value)])),
+  w: { when: '', where: '', who: '', what: '', why: '', how: '' },
+  soap: sc.model.soap,
+  ...over,
+});
+
+describe('checkSoap', () => {
+  it('flags speculation in O', () => {
+    const f = checkSoap({ s: '「だるい」', o: '7:30 体温37.8℃。風邪をひいたのだと思う。', a: '発熱の可能性がある', p: '再測定する' });
+    expect(f.some((x) => x.severity === 'error' && x.part === 'O' && x.match === 'のだと思')).toBe(true);
+  });
+  it('flags vague words and labels', () => {
+    const f = checkSoap({ s: '「帰る」', o: '16:30 徘徊あり。水分を少し飲んだ。', a: '不安が考えられる', p: '声かけする' });
+    expect(f.find((x) => x.match === '徘徊')?.severity).toBe('error');
+    expect(f.find((x) => x.match === '少し')?.severity).toBe('warn');
+  });
+  it('warns when time or numbers missing', () => {
+    const f = checkSoap({ s: '「痛い」', o: '居室で本人が腰を押さえていた様子を確認した', a: '痛みの可能性', p: '看護師へ報告する' });
+    expect(f.some((x) => x.message.includes('時刻'))).toBe(true);
+    expect(f.some((x) => x.message.includes('数字'))).toBe(true);
+  });
+  it('accepts full-width digits as time', () => {
+    const f = checkSoap({ s: '「痛い」', o: '７：３０ 居室で体温３７.８℃を測定した。看護師に報告した。', a: '発熱の可能性がある', p: '再測定する' });
+    expect(f.some((x) => x.severity === 'warn' && x.message.includes('時刻'))).toBe(false);
+  });
+});
+
+describe('evaluate against model answers', () => {
+  for (const sc of SCENARIOS) {
+    it(`${sc.id}: model answer scores >= 85`, () => {
+      const r = evaluate(entryFor(sc), sc, categoryById(sc.category));
+      const missed = r.keyPointHits.filter((k) => !k.hit).map((k) => k.label);
+      const wrong = r.fieldHits.filter((k) => !k.ok).map((k) => `${k.label}: ${k.actual} != ${k.expected}`);
+      expect(missed, `missed key points`).toEqual([]);
+      expect(wrong, `wrong fields`).toEqual([]);
+      expect(r.findings.filter((f) => f.severity === 'error')).toEqual([]);
+      expect(r.score).toBeGreaterThanOrEqual(85);
+    });
+  }
+  it('empty answer scores low', () => {
+    const sc = SCENARIOS[0];
+    const r = evaluate(entryFor(sc, { fields: {}, soap: { s: '', o: 'だるそうだった。', a: '', p: '' } }), sc, categoryById(sc.category));
+    expect(r.score).toBeLessThan(30);
+  });
+});
+
+describe('overlapping words', () => {
+  it('reports のだと思 only once', () => {
+    const f = checkSoap({ s: '「だるい」', o: '7:30 体温37.8℃。風邪をひいたのだと思う。', a: '可能性がある', p: '観察する' });
+    expect(f.filter((x) => x.severity === 'error').map((x) => x.match)).toEqual(['のだと思']);
+  });
+});
+
+describe('quoted resident words', () => {
+  it('does not flag guess words inside 「」 in S', () => {
+    const f = checkSoap({ s: '「あの人が盗ったんでしょう」', o: '10:00 居室で「財布がない」と話した。', a: '不安が強い可能性がある', p: '一緒に探し、看護師に報告する' });
+    expect(f.some((x) => x.part === 'S' && x.code === 'speculation')).toBe(false);
+  });
+  it('still flags staff guesses written in S outside quotes', () => {
+    const f = checkSoap({ s: '盗られたと思っているようだ', o: '10:00 居室で「財布がない」と話した。', a: '可能性がある', p: '観察する' });
+    expect(f.some((x) => x.part === 'S' && x.code === 'speculation')).toBe(true);
+  });
+});
+
+describe('resident words and free-text fields', () => {
+  it('does not flag vague words or labels inside 「」', () => {
+    const f = checkSoap({ s: '「少し痛い。うるさいなあ」', o: '10:00 居室で「少し痛い」「うるさいなあ」と話した。', a: '痛みの可能性がある', p: '看護師に報告する' });
+    expect(f.filter((x) => x.code === 'vague' || x.code === 'label')).toEqual([]);
+  });
+  it('flags new labels written by staff', () => {
+    const f = checkSoap({ s: '（特になし）', o: '10:00 お漏らしあり。年だから仕方ない。', a: '可能性がある', p: '観察する' });
+    expect(f.filter((x) => x.code === 'label').map((x) => x.match)).toEqual(['お漏らし', '年だから']);
+  });
+  it('accepts small differences in free-text fields', async () => {
+    const { SCENARIOS } = await import('../data/scenarios');
+    const sc = SCENARIOS.find((s) => s.id === 'behavior-01')!;
+    const base = entryFor(sc);
+    const r = evaluate({ ...base, fields: { ...base.fields, place: '2階の廊下にて' } }, sc, categoryById(sc.category));
+    expect(r.fieldHits.find((h) => h.id === 'place')?.ok).toBe(true);
+    const r2 = evaluate({ ...base, fields: { ...base.fields, place: '食堂' } }, sc, categoryById(sc.category));
+    expect(r2.fieldHits.find((h) => h.id === 'place')?.ok).toBe(false);
+  });
+});
