@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Ruby } from '../components/Ruby';
 import { PRICE } from '../data/info';
-import { FACT_QUIZ } from '../data/factQuiz';
 import { GLOSSARY } from '../data/glossary';
 import { SCENARIOS } from '../data/scenarios';
 import { t } from '../i18n';
 import {
-  buy, canRedeemCode, getPlan, isFreeQuiz, isFreeScenario, isFreeTerm, MANAGE_URL, previewToggleEnabled, purchasesAvailable, redeemCode, restore, type Plan,
+  buy, canRedeemCode, getPlan, isFreeScenario, isFreeTerm, MANAGE_URL, previewToggleEnabled, purchasesAvailable, redeemCode, restore, type Plan,
 } from '../lib/premium';
 import type { Lang } from '../types';
 
@@ -24,7 +23,6 @@ export function Premium({ lang, premium, onPreviewToggle, onOpenInfo, onBack }: 
   const [msg, setMsg] = useState<{ kind: 'good' | 'error' | 'info'; text: string } | null>(null);
   const free = SCENARIOS.filter(isFreeScenario).length;
   const total = SCENARIOS.length;
-  const freeQ = FACT_QUIZ.filter(isFreeQuiz).length;
   const freeT = GLOSSARY.filter(isFreeTerm).length;
 
   useEffect(() => {
@@ -67,7 +65,7 @@ export function Premium({ lang, premium, onPreviewToggle, onOpenInfo, onBack }: 
       <div className="card">
         <ul className="check-list">
           <li><span className="mark ok">✓</span><div><Ruby text={`${t(lang, 'benefitScenes')}（${total}${t(lang, 'scenesUnit')}）`} /><small><Ruby text={`${t(lang, 'freeNote')} ${free}${t(lang, 'scenesUnit')}`} /></small></div></li>
-          <li><span className="mark ok">✓</span><div><Ruby text={`${t(lang, 'benefitQuiz')}（${FACT_QUIZ.length}${t(lang, 'questionsUnit')}）`} /><small>{t(lang, 'freeQuizNote').split('（')[0].replace('{free}', String(freeQ))}</small></div></li>
+          <li><span className="mark ok">✓</span><div><Ruby text={`${t(lang, 'benefitQuiz')}`} /><small>{t(lang, 'freeQuizShort')}</small></div></li>
           <li><span className="mark ok">✓</span><div><Ruby text={`${t(lang, 'benefitTerms')}（${GLOSSARY.length}${t(lang, 'termsUnit')}）`} /><small>{t(lang, 'freeTermsNote').split('（')[0].replace('{free}', String(freeT))}</small></div></li>
           <li><span className="mark ok">✓</span><div><Ruby text={t(lang, 'benefitNew')} /></div></li>
           <li><span className="mark ok">✓</span><div><Ruby text={t(lang, 'benefitReview')} /></div></li>
