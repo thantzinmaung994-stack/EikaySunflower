@@ -25,10 +25,11 @@
 | マーケティング URL（任意） | https://app.eikaysunflower.com/kaigo-kiroku/ |
 | 利用規約（EULA） | https://app.eikaysunflower.com/kaigo-kiroku/terms.html |
 
-ページは GitHub Pages で公開し、`eikaysunflower.com` のサブドメイン `app.eikaysunflower.com` で表示します（設定は1回だけ）。
-1. Xserver の DNS に CNAME を追加：ホスト名 `app`、内容 `thantzinmaung994-stack.github.io`
-2. GitHub →「Settings」→「Pages」→「Custom domain」に `app.eikaysunflower.com` → Save →「Enforce HTTPS」にチェック
-（`docs/CNAME` はリポジトリに入れてあります）
+ページは Xserver の `app.eikaysunflower.com` に置きます（ほかのアプリと同じ置き方。DNS は変えません）。
+1. リポジトリの `docs/kaigo-kiroku/` にある6つの HTML（index・privacy・terms・support・howto・about）を用意する
+2. Xserver の「ファイル管理」で、`app.eikaysunflower.com` の公開フォルダ（ほかのアプリのフォルダが並んでいる場所）に `kaigo-kiroku` フォルダを作り、6つをアップロードする
+3. 上の URL が開けることを確認する
+ページの文章（`src/data/info.ts`）を変えたときは、`npm run site` で作り直して、同じようにアップロードし直します。
 
 ## プロモーションテキスト（170文字まで・いつでも変更可）
 
