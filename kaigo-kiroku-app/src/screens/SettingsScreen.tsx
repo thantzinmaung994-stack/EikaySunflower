@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { BackupPanel } from '../components/BackupPanel';
+import { VoicePicker } from '../components/VoicePicker';
 import { INFO_PAGES, type InfoPage } from '../data/info';
 import { speechSupported } from '../lib/speech';
 import { t } from '../i18n';
@@ -54,6 +55,7 @@ export function SettingsScreen({ settings, onChange, onOpenInfo, onClearData, pr
             <button className={!settings.furigana ? 'on' : ''} onClick={() => onChange({ ...settings, furigana: false })}>OFF</button>
           </div>
         </div>
+        {speechSupported() && <VoicePicker settings={settings} onChange={onChange} />}
         {speechSupported() && (
           <div className="setting-row">
             <span>🔊 {t(lang, 'speechRate')}</span>
