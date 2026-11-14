@@ -204,6 +204,9 @@ ruby rt { font-size: 0.55em; color: var(--muted); font-weight: 400; letter-spaci
 /* ---- 設定 ---- */
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 0; border-bottom: 1px dashed var(--line); flex-wrap: wrap; }
 .setting-row:last-child { border-bottom: 0; }
+.voice-controls { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; max-width: 100%; }
+.voice-controls select { border: 1px solid #e5e7eb; border-radius: 10px; padding: 6px 10px; background: #fff; max-width: 100%; min-width: 0; }
+.voice-hint { font-size: 12px; padding: 0 0 10px; border-bottom: 1px dashed var(--line); }
 .setting-row input[type=time] { border: 1px solid #e5e7eb; border-radius: 10px; padding: 6px 10px; background: #fff; }
 .seg { display: inline-flex; border: 1px solid var(--navy); border-radius: 10px; overflow: hidden; }
 .seg button { border: 0; background: #fff; color: var(--navy); padding: 6px 12px; font-size: 14px; font-weight: 700; }

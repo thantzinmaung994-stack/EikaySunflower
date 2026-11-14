@@ -12,6 +12,8 @@ export interface Settings {
   dailyGoal: number;
   /** 読み上げの速さ（0.7＝ゆっくり、0.9＝ふつう） */
   speechRate: number;
+  /** 読み上げの声（端末の声のID）。空なら、いちばん自然な声を自動で選ぶ */
+  speechVoice: string;
   /** 初回の使い方を見たか */
   onboarded: boolean;
 }
@@ -22,6 +24,7 @@ export const DEFAULT_SETTINGS: Settings = {
   reminder: { on: false, hour: 20, minute: 0 },
   dailyGoal: 1,
   speechRate: 0.9,
+  speechVoice: '',
   onboarded: false,
 };
 

@@ -4,7 +4,7 @@ import { speak, speechSupported, stopSpeaking } from '../lib/speech';
 
 /** 🔊 ボタン。押すと日本語で読み上げ、もう一度押すと止まる */
 export function Speak({ text, label = '読み上げ' }: { text: string; label?: string }) {
-  const { speechRate } = useSettings();
+  const { speechRate, speechVoice } = useSettings();
   const [on, setOn] = useState(false);
   useEffect(() => () => stopSpeaking(), []);
   if (!speechSupported() || !text) return null;
@@ -21,7 +21,7 @@ export function Speak({ text, label = '読み上げ' }: { text: string; label?: 
           setOn(false);
         } else {
           setOn(true);
-          speak(text, speechRate, () => setOn(false));
+          speak(text, speechRate, () => setOn(false), speechVoice);
         }
       }}
     >

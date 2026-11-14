@@ -14,9 +14,11 @@
     "cap:android": "npm run cap:sync && cap open android",
     "my:sync": "vite-node scripts/sync-myanmar.mts",
     "content:check": "vite-node scripts/check-content.mts",
-    "site": "vite-node scripts/build-site.mts"
+    "site": "vite-node scripts/build-site.mts",
+    "rc:key": "node scripts/set-rc-key.mjs"
   },
   "dependencies": {
+    "@capacitor-community/text-to-speech": "8.0.2",
     "@capacitor/android": "^8.5.3",
     "@capacitor/core": "^8.5.3",
     "@capacitor/filesystem": "8.1.5",
