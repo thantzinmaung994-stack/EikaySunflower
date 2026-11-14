@@ -25,9 +25,27 @@ export function Premium({ lang, premium, onPreviewToggle, onOpenInfo, onBack }: 
   const total = SCENARIOS.length;
   const freeT = GLOSSARY.filter(isFreeTerm).length;
 
+  // 料金の読み込み。通信が不安定なときは、間をあけて何度か取り直す
+  const [planFailed, setPlanFailed] = useState(false);
+  const [loadCount, setLoadCount] = useState(0);
   useEffect(() => {
-    if (purchasesAvailable()) void getPlan().then(setPlan);
-  }, []);
+    if (!purchasesAvailable()) return;
+    let alive = true;
+    setPlanFailed(false);
+    (async () => {
+      for (const wait of [0, 2000, 4000, 8000]) {
+        if (wait) await new Promise((r) => setTimeout(r, wait));
+        if (!alive) return;
+        const p = await getPlan();
+        if (!alive) return;
+        if (p) return setPlan(p);
+      }
+      setPlanFailed(true);
+    })();
+    return () => {
+      alive = false;
+    };
+  }, [loadCount]);
 
   const price = plan?.price ?? `¥${PRICE.monthly}`;
   const trial = plan?.trialDays ?? 0;
@@ -87,7 +105,13 @@ export function Premium({ lang, premium, onPreviewToggle, onOpenInfo, onBack }: 
           <button className="btn gold" onClick={onBuy} disabled={busy || !plan}>
             {busy ? '…' : trial > 0 ? t(lang, 'startTrial') : t(lang, 'subscribe')}
           </button>
-          {!plan && !busy && <div className="muted" style={{ marginTop: 6 }}>{t(lang, 'planLoading')}</div>}
+          {!plan && !busy && !planFailed && <div className="muted" style={{ marginTop: 6 }}>{t(lang, 'planLoading')}</div>}
+          {!plan && planFailed && (
+            <div className="finding error" style={{ marginTop: 6 }}>
+              {t(lang, 'planFailed')}
+              <button className="btn ghost small" style={{ marginTop: 6 }} onClick={() => setLoadCount((n) => n + 1)}>{t(lang, 'retry')}</button>
+            </div>
+          )}
         </>
       ) : (
         <div className="finding info">{t(lang, 'buyInApp')}</div>

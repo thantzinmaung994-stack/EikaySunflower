@@ -53,19 +53,25 @@ export const previewToggleEnabled = () => !Capacitor.isNativePlatform() && impor
 const isActive = (info: CustomerInfo) => !!info.entitlements.active[ENTITLEMENT];
 
 let configured = false;
+let ready: Promise<void> | null = null;
+let notify: ((active: boolean) => void) | null = null;
 
 /** 起動時に呼ぶ。購入状態が変わるたびに onChange が呼ばれる */
-export async function initPremium(onChange: (active: boolean) => void): Promise<void> {
-  if (!purchasesAvailable() || configured) return;
-  try {
-    await Purchases.configure({ apiKey: apiKey()! });
-    configured = true;
-    await Purchases.addCustomerInfoUpdateListener((info) => onChange(isActive(info)));
-    const { customerInfo } = await Purchases.getCustomerInfo();
-    onChange(isActive(customerInfo));
-  } catch {
-    // 通信できないときは前回の状態のまま（RevenueCat も端末に購入状態を保存している）
-  }
+export function initPremium(onChange: (active: boolean) => void): Promise<void> {
+  if (!purchasesAvailable()) return Promise.resolve();
+  notify = onChange;
+  ready ??= (async () => {
+    try {
+      await Purchases.configure({ apiKey: apiKey()! });
+      configured = true;
+      await Purchases.addCustomerInfoUpdateListener((info) => notify?.(isActive(info)));
+      const { customerInfo } = await Purchases.getCustomerInfo();
+      notify?.(isActive(customerInfo));
+    } catch {
+      // 通信できないときは前回の状態のまま（RevenueCat も端末に購入状態を保存している）
+    }
+  })();
+  return ready;
 }
 
 export interface Plan {
@@ -76,6 +82,8 @@ export interface Plan {
 }
 
 export async function getPlan(): Promise<Plan | null> {
+  // 起動直後に購入画面を開いても、準備が終わるのを待ってから料金を取りに行く
+  await ready;
   if (!configured) return null;
   try {
     const offerings = await Purchases.getOfferings();
@@ -95,7 +103,9 @@ export type BuyResult = 'ok' | 'cancelled' | 'error';
 export async function buy(plan: Plan): Promise<BuyResult> {
   try {
     const { customerInfo } = await Purchases.purchasePackage({ aPackage: plan.pkg });
-    return isActive(customerInfo) ? 'ok' : 'error';
+    const active = isActive(customerInfo);
+    notify?.(active);
+    return active ? 'ok' : 'error';
   } catch (e) {
     return (e as { userCancelled?: boolean })?.userCancelled ? 'cancelled' : 'error';
   }
@@ -105,7 +115,9 @@ export async function buy(plan: Plan): Promise<BuyResult> {
 export async function restore(): Promise<boolean> {
   try {
     const { customerInfo } = await Purchases.restorePurchases();
-    return isActive(customerInfo);
+    const active = isActive(customerInfo);
+    notify?.(active);
+    return active;
   } catch {
     return false;
   }

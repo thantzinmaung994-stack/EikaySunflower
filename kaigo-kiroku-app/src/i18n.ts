@@ -206,6 +206,8 @@ const T = {
     startTrial: '無料で試してみる',
     subscribe: '登録する',
     planLoading: '料金を読み込み中です…',
+    planFailed: '料金を読み込めませんでした。通信を確認して、もう一度お試しください。',
+    retry: 'もう一度読み込む',
     buyInApp: '購入は iPhone のアプリ版でできます。',
     restore: '購入を復元',
     redeemCode: '受講生コードを使う',
