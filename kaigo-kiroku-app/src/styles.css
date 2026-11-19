@@ -280,3 +280,9 @@ a.btn { text-decoration: none; }
 .delta.up { color: var(--good); } .delta.down { color: var(--error); }
 .choice-text { display: block; width: 100%; }
 .quiz-btn ruby rt, .btn ruby rt { color: inherit; opacity: .85; }
+
+/* 記録を整える */
+.polish-draft { font-size: 16px; line-height: 2; background: #fffdf5; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 0 0 6px; white-space: pre-wrap; }
+.polish-draft mark.ph { background: #fff1c2; color: var(--gold-text, #8a6414); border-radius: 4px; padding: 0 2px; font-weight: 700; }
+.polish-from { text-decoration: line-through; color: var(--muted); }
+.check-list li small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }

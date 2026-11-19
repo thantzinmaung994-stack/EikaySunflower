@@ -11,13 +11,14 @@ interface Props {
   records: RecordEntry[];
   onSelect: (id: string) => void;
   onFree: () => void;
+  onPolish: () => void;
   premium: boolean;
   onLocked: () => void;
 }
 
 const grade = (s: number) => (s >= 80 ? 'good' : s >= 50 ? 'mid' : 'low');
 
-export function PracticeList({ lang, records, onSelect, onFree, premium, onLocked }: Props) {
+export function PracticeList({ lang, records, onSelect, onFree, onPolish, premium, onLocked }: Props) {
   const [filter, setFilter] = useState<CategoryId | 'all'>('all');
   const list = SCENARIOS.filter((s) => filter === 'all' || s.category === filter);
   const best = (id: string) =>
@@ -27,7 +28,8 @@ export function PracticeList({ lang, records, onSelect, onFree, premium, onLocke
     <>
       <div className="card">
         <h2>{t(lang, 'tabPractice')}</h2>
-        <button className="btn ghost" style={{ marginBottom: 10 }} onClick={onFree}>✏️ {t(lang, 'freeRecord')}</button>
+        <button className="btn ghost" style={{ marginBottom: 8 }} onClick={onFree}>✏️ {t(lang, 'freeRecord')}</button>
+        <button className="btn ghost" style={{ marginBottom: 10 }} onClick={onPolish}>📋 {t(lang, 'polishOpen')}</button>
         <div className="cat-grid">
           <button className={`cat-tile${filter === 'all' ? ' active' : ''}`} onClick={() => setFilter('all')}>
             <span className="ico">📚</span>ALL

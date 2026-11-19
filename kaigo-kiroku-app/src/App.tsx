@@ -13,6 +13,7 @@ import { PracticeList } from './screens/PracticeList';
 import { RecordEditor } from './screens/RecordEditor';
 import { InfoView, SettingsScreen } from './screens/SettingsScreen';
 import { Premium } from './screens/Premium';
+import { Polish } from './screens/Polish';
 import { initPremium, isFreeScenario, previewToggleEnabled } from './lib/premium';
 import type { CategoryId, QuizResult, RecordEntry } from './types';
 import logoMark from './assets/logo-mark.png';
@@ -22,6 +23,7 @@ type View =
   | { kind: 'tab'; tab: Tab }
   | { kind: 'scenario'; id: string }
   | { kind: 'free'; cat?: CategoryId }
+  | { kind: 'polish' }
   | { kind: 'settings' }
   | { kind: 'premium' }
   | { kind: 'info'; id: InfoPage['id'] };
@@ -127,7 +129,7 @@ export default function App() {
   };
 
   const activeTab: Tab | null =
-    view.kind === 'tab' ? view.tab : view.kind === 'scenario' || view.kind === 'free' ? 'practice' : null;
+    view.kind === 'tab' ? view.tab : view.kind === 'scenario' || view.kind === 'free' || view.kind === 'polish' ? 'practice' : null;
 
   const tabs: { id: Tab; ico: string; key: 'tabHome' | 'tabPractice' | 'tabQuiz' | 'tabHistory' | 'tabLearn' }[] = [
     { id: 'home', ico: '🏠', key: 'tabHome' },
@@ -145,6 +147,8 @@ export default function App() {
     body = <RecordEditor key={view.id} lang={lang} scenario={scenarioById(view.id)} onSave={upsert} onExit={() => go({ kind: 'tab', tab: 'history' })} />;
   } else if (view.kind === 'free') {
     body = <RecordEditor key={`free-${view.cat ?? ''}`} lang={lang} initialCategory={view.cat} onSave={upsert} onExit={() => go({ kind: 'tab', tab: 'history' })} />;
+  } else if (view.kind === 'polish') {
+    body = <Polish settings={settings} onChange={updateSettings} onBack={() => go({ kind: 'tab', tab: 'practice' })} />;
   } else if (view.kind === 'settings') {
     body = <SettingsScreen settings={settings} onChange={updateSettings} onOpenInfo={(id) => go({ kind: 'info', id })} onClearData={clearData} premium={premium} onOpenPremium={() => go({ kind: 'premium' })} />;
   } else if (view.kind === 'premium') {
@@ -167,7 +171,7 @@ export default function App() {
       />
     );
   } else if (view.tab === 'practice') {
-    body = <PracticeList lang={lang} records={records} onSelect={(id) => go({ kind: 'scenario', id })} onFree={() => go({ kind: 'free' })} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
+    body = <PracticeList lang={lang} records={records} onSelect={(id) => go({ kind: 'scenario', id })} onFree={() => go({ kind: 'free' })} onPolish={() => go({ kind: 'polish' })} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
   } else if (view.tab === 'quiz') {
     body = <QuizHub lang={lang} quizzes={quizzes} onFinish={addQuiz} premium={premium} onLocked={() => go({ kind: 'premium' })} />;
   } else if (view.tab === 'history') {

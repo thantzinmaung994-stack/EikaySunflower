@@ -14,6 +14,8 @@ export interface Settings {
   speechRate: number;
   /** 読み上げの声（端末の声のID）。空なら、いちばん自然な声を自動で選ぶ */
   speechVoice: string;
+  /** 記録を整える：敬語をふつうの言い方に直す */
+  polishPlain: boolean;
   /** 初回の使い方を見たか */
   onboarded: boolean;
 }
@@ -25,6 +27,7 @@ export const DEFAULT_SETTINGS: Settings = {
   dailyGoal: 1,
   speechRate: 0.9,
   speechVoice: '',
+  polishPlain: true,
   onboarded: false,
 };
 
