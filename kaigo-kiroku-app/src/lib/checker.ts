@@ -100,7 +100,9 @@ export function checkSoap(soap: Soap, category?: CategoryDef): Finding[] {
   const all = `${soap.s}\n${soap.o}\n${soap.a}\n${soap.p}`;
 
   // --- O: 事実と推測の区別 ---
-  for (const w of findAll(stripQuotes(soap.o), SPECULATION)) {
+  // 「かわいそうだ」の「そうだ」を推測として二重に数えないよう、感情の語を先に消す
+  const withoutFeelings = (s: string) => FEELINGS.reduce((t, w) => t.split(w).join('■'.repeat(w.length)), toHalf(s));
+  for (const w of findAll(withoutFeelings(stripQuotes(soap.o)), SPECULATION)) {
     f.push({ code: 'speculation', severity: 'error', part: 'O', match: w, message: `「${w}」は推測です。O（客観的情報）には見たこと・聞いたこと・測った数字だけを書き、推測は A に「〜の可能性がある」と書きましょう。` });
   }
   for (const w of findAll(stripQuotes(soap.o), FEELINGS)) {
