@@ -1,0 +1,117 @@
+/*
+ * EikaySunflower 個人用テキスト 共通スタイル（B5 182×257mm）
+ * 各章の HTML から <link rel="stylesheet" href="textbook.css"> で読み込む。
+ * 1ページ = <article class="sheet">、その中に本文エリア（.area-odd / .area-even / .area-full）と
+ * ページ番号（.pn-odd / .pn-even）を置く。奇数ページは右に見出しインデックス（.tab）。
+ */
+
+:root{
+  --navy:#1A2744; --navy2:#2C3D63; --gold:#C9A227; --sun:#F2C230; --sunL:#FFF4CC; --sunLL:#FFFAE8;
+  --green:#4F8F60; --greenL:#E6F2E8; --brown:#7A4E24; --red:#B8433A; --redL:#FBEAE8;
+  --partA:#3DA35D; --partB:#E8547A; --partC:#3B82C4; --ink:#1F2430; --sub:#5A6070; --line:#D9D3C2; --cream:#FFFDF6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{font-family:'Noto Sans CJK JP','Noto Sans JP',sans-serif;font-size:10.5pt;line-height:1.72;color:var(--ink);-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.page{break-after:page;position:relative;height:233mm;overflow:hidden}
+.odd{padding-right:18mm} .even{padding-left:12mm}
+.cover,.opener{padding:0}
+.opener.odd{margin-right:6mm}
+.page:last-child{break-after:auto}
+h1,h2,h3,h4{margin:0;font-weight:700;line-height:1.35}
+.serif{font-family:'Noto Serif CJK JP','Noto Serif JP',serif}
+p{margin:0 0 2.2mm}
+b,strong{color:var(--navy);font-weight:700}
+.hl{background:linear-gradient(transparent 58%,#FBE08A 58%);font-weight:700;color:var(--ink)}
+.red{color:var(--red);font-weight:700}
+.small{font-size:9.5pt}
+.xs{font-size:9pt}
+ruby{ruby-align:center} ruby rt{font-size:.46em;color:#444;font-weight:400;letter-spacing:-.02em}
+th ruby rt{color:#e8e8e8} .tag ruby rt{color:#eee}
+/* ヘッダー・ロゴ */
+.hdr{height:9mm;margin-bottom:4mm;display:flex;align-items:flex-end;justify-content:space-between;border-bottom:.4mm solid var(--gold);padding-bottom:1.2mm}
+.hdr .lg{display:flex;align-items:center;gap:2mm;font-size:7.5pt;letter-spacing:.12em;color:var(--navy);font-weight:700}
+.hdr .lg img{height:7mm;width:auto}
+.hdr .lg small{display:block;font-size:5.5pt;letter-spacing:.18em;color:#7a8093;font-weight:500}
+.hdr .ch{font-size:8pt;color:#5A6070}
+/* サイドインデックス */
+.tab{position:absolute;top:11mm;right:0;width:10mm;background:var(--navy);color:#fff;display:flex;flex-direction:column;align-items:center;padding:3.2mm 0 3mm;gap:1.6mm;border-radius:2.2mm 0 0 2.2mm}
+.tab .v{writing-mode:vertical-rl;font:700 11pt/1 'Noto Sans CJK JP','Noto Sans JP';letter-spacing:.04em;white-space:nowrap;color:#fff}
+.tab .p{background:var(--gold);color:var(--navy);font:900 9pt/1 'Noto Sans CJK JP','Noto Sans JP';width:5.2mm;height:5.2mm;border-radius:.6mm;display:flex;align-items:center;justify-content:center}
+.odd .tab{right:0}
+.even .tab{display:none}
+.even{padding-left:0}
+
+/* セクション見出し */
+.sec{display:flex;align-items:stretch;margin-bottom:3.5mm}
+.sec .no{background:var(--navy);color:var(--sun);font:700 17pt 'Noto Serif CJK JP','Noto Serif JP';padding:1.5mm 4mm;border-radius:2mm 0 0 2mm;display:flex;align-items:center}
+.sec .tt{flex:1;background:var(--sunL);border-bottom:.8mm solid var(--gold);padding:1.8mm 4mm;display:flex;flex-direction:column;justify-content:center}
+.sec .tt h2{font:700 16pt 'Noto Serif CJK JP','Noto Serif JP';color:var(--navy)}
+.sec .tt .kw{font-size:8.5pt;color:var(--sub);margin-top:.5mm}
+.freq{display:inline-block;font-size:8.5pt;color:var(--brown);border:1px solid var(--gold);border-radius:3mm;padding:0 2.2mm;margin-left:2mm;vertical-align:middle;background:#fff;font-weight:700;letter-spacing:.05em}
+h3.t{font-size:13pt;color:var(--navy);padding:0 0 1mm 0;border-bottom:1.2px solid var(--line);margin:2.6mm 0 2mm;display:block}
+h3.t::before{content:"";display:inline-block;width:3.2mm;height:3.2mm;background:var(--sun);border:1px solid var(--gold);border-radius:1mm;margin-right:2mm;vertical-align:-.3mm}
+h3.t .freq{vertical-align:1mm}
+.goal{background:var(--greenL);border-radius:2mm;padding:2mm 4mm;margin-bottom:2.5mm;font-size:10pt}
+.goal .lb{display:inline-block;background:var(--green);color:#fff;font-size:8.5pt;font-weight:700;border-radius:1.5mm;padding:0 2mm;margin-right:2mm}
+
+/* 箱 */
+.box{border:1.2px solid var(--line);border-radius:2.5mm;padding:3mm 4mm;margin-bottom:3mm;background:#fff}
+.box .bt{font-weight:700;color:var(--navy);margin-bottom:1mm}
+.point{background:var(--sunLL);border:1.4px solid var(--gold);border-radius:2.5mm;padding:2.4mm 4mm 1.5mm;margin:2.5mm 0 2.5mm;position:relative}
+.point .pl{position:absolute;top:-2.6mm;left:3mm;background:var(--gold);color:#fff;font-size:8.5pt;font-weight:700;padding:0 2.5mm;border-radius:1.5mm;letter-spacing:.05em}
+.point ul{margin:0;padding-left:4.5mm}
+.point li{margin-bottom:.8mm}
+.scene{background:var(--greenL);border-radius:2.5mm;padding:2.8mm 4mm;margin:2.5mm 0 3mm;display:flex;gap:3mm;align-items:flex-start}
+.scene .sl{flex:none;background:var(--green);color:#fff;font-size:8.5pt;font-weight:700;border-radius:1.5mm;padding:.3mm 2mm;margin-top:.6mm}
+.trap{background:var(--redL);border-left:0;border-radius:2.5mm;padding:2.6mm 4mm;margin:2.5mm 0 3mm}
+.trap .tl{color:var(--red);font-weight:700;font-size:9.5pt;margin-bottom:.5mm}
+.quiz{border:1.2px dashed var(--navy2);border-radius:2.5mm;padding:2.2mm 4mm 2mm;margin:2.5mm 0}
+.quiz .ql{font-weight:700;color:var(--navy);font-size:9.5pt;margin-bottom:1mm}
+.quiz .q{display:flex;gap:2mm;font-size:9.8pt;margin-bottom:.9mm}
+.quiz .q .n{flex:none;font-weight:700;color:var(--navy)}
+.quiz .a{font-size:9pt;color:var(--sub);border-top:1px dotted var(--line);padding-top:1mm;margin-top:1mm}
+
+/* 表 */
+table{border-collapse:collapse;width:100%;font-size:9.6pt;margin-bottom:3mm}
+th,td{border:1px solid #CFC8B4;padding:1mm 2.2mm;line-height:1.55;vertical-align:top;text-align:left}
+th{background:var(--navy);color:#fff;font-weight:700}
+td.h{background:var(--sunL);font-weight:700;color:var(--navy);white-space:nowrap}
+tr.alt td{background:#FFFDF6}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:4mm}
+.fig{text-align:center;margin:1mm 0 2.5mm}
+.fig svg{max-width:100%}
+.cap{font-size:8.5pt;color:var(--sub);text-align:center;margin-top:.5mm}
+.terms{display:grid;grid-template-columns:auto 1fr;gap:1mm 3mm;font-size:9.6pt;margin:0}
+.terms dt{font-weight:700;color:var(--navy)}
+.terms dd{margin:0}
+.tag{display:inline-block;background:var(--navy);color:#fff;font-size:8pt;border-radius:1mm;padding:0 1.5mm;margin-right:1mm;vertical-align:1px}
+.tag.g{background:var(--green)} .tag.y{background:var(--gold)} .tag.r{background:var(--red)}
+
+/* ================= 用紙（シート）とレイアウト ================= */
+@page{size:182mm 257mm;margin:0}
+.sheet{width:182mm;height:257mm;position:relative;overflow:hidden;background:#fff;font-family:'Noto Sans CJK JP','Noto Sans JP',sans-serif;color:var(--ink);break-after:page}
+.sheet:last-of-type{break-after:auto}
+.area{position:absolute;top:8mm;height:233mm}
+.area-full{left:0;top:0;width:182mm;height:257mm}
+.area-odd{left:18mm;width:164mm}
+.area-even{left:14mm;width:150mm}
+.pn{position:absolute;top:241mm;height:16mm;display:flex;align-items:center;font-size:9.5pt;font-weight:600;color:var(--navy)}
+.pn-odd{right:14mm}
+.pn-even{left:14mm}
+.svg-defs{position:absolute;width:0;height:0}
+
+/* 画面で見るとき：用紙を並べて表示 */
+@media screen{
+  body{background:#E9E6DD}
+  .book{display:flex;flex-direction:column;align-items:center;gap:8mm;padding:8mm 0}
+  .sheet{box-shadow:0 1px 3px rgba(26,39,68,.18),0 6px 18px rgba(26,39,68,.10)}
+  .toolbar{position:sticky;top:0;z-index:10;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 16px;background:var(--navy);color:#fff;font-size:10pt}
+  .toolbar button{min-height:44px;padding:0 18px;border:0;border-radius:6px;background:var(--gold);color:var(--navy);font:700 10pt 'Noto Sans JP',sans-serif;cursor:pointer}
+  .toolbar button:hover{background:var(--sun)}
+}
+@media print{
+  body{background:#fff}
+  .toolbar{display:none}
+}
