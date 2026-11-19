@@ -280,3 +280,31 @@ a.btn { text-decoration: none; }
 .delta.up { color: var(--good); } .delta.down { color: var(--error); }
 .choice-text { display: block; width: 100%; }
 .quiz-btn ruby rt, .btn ruby rt { color: inherit; opacity: .85; }
+
+/* 記録を整える */
+.polish-draft { font-size: 16px; line-height: 2; background: #fffdf5; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; margin: 0 0 6px; white-space: pre-wrap; }
+.polish-draft mark.ph { background: #fff1c2; color: var(--gold-text, #8a6414); border-radius: 4px; padding: 0 2px; font-weight: 700; }
+.polish-from { text-decoration: line-through; color: var(--muted); }
+.check-list li small { display: block; color: var(--muted); font-size: 12px; margin-top: 2px; }
+
+/* 書き直し・前回とくらべる */
+.compare { border-left: 5px solid var(--gold); }
+.compare-score { display: flex; align-items: center; justify-content: center; gap: 14px; margin: 6px 0 4px; }
+.compare-score > div { text-align: center; }
+.compare-score small { display: block; color: var(--muted); font-size: 12px; }
+.compare-score b { font-size: 34px; font-weight: 900; color: var(--navy); }
+.compare-score .arrow { font-size: 22px; color: var(--muted); }
+.compare-score .delta { font-size: 18px; font-weight: 900; padding: 4px 10px; border-radius: 999px; background: #eef1f5; color: var(--muted); }
+.compare-score .delta.up { background: #f0fdf4; color: var(--good); }
+.compare-score .delta.down { background: #fef2f2; color: var(--error); }
+.compare-text { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; }
+.compare-text p { margin: 0; font-size: 14px; line-height: 1.8; background: #fff; border: 1px solid var(--line); border-radius: 10px; padding: 6px 10px; flex: 1; white-space: pre-wrap; }
+.compare-text ins { text-decoration: none; background: #dcfce7; border-bottom: 2px solid var(--good); }
+.compare-text del { color: var(--error); background: #fef2f2; }
+.compare-whole { flex: 1; display: grid; gap: 4px; }
+.compare-whole small { color: var(--muted); font-size: 12px; }
+.compare-whole p { flex: none; }
+
+/* 採点の説明をミャンマー語で */
+.my-explain-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; border: 1px solid currentColor; background: #fff; color: var(--navy); border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 700; opacity: .9; }
+.my-explain { margin: 6px 0 0; padding: 8px 10px; background: #fff; border-radius: 8px; border: 1px dashed var(--line); color: var(--ink, #1f2937); font-size: 14px; line-height: 1.9; }

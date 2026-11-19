@@ -5,6 +5,7 @@ import { t } from '../i18n';
 import { my } from '../lib/myanmar';
 import { Ruby } from './Ruby';
 import { Speak } from './Speak';
+import { FindingRow } from './FindingRow';
 
 interface Props {
   result: CheckResult;
@@ -79,19 +80,7 @@ export function ResultPanel({ result, scenario, lang }: Props) {
       <div className="card">
         <h2>{t(lang, 'writingCheck')}</h2>
         {findings.map((f, i) => (
-          <div key={i} className={`finding ${f.severity}`}>
-            <span className="part">{f.part}</span>
-            <div>
-              {f.match ? (
-                <>
-                  <mark>{f.match}</mark> <Ruby text={f.message.replace(`「${f.match}」`, '')} />
-                </>
-              ) : (
-                <Ruby text={f.message} />
-              )}
-              {f.suggestion && <span className="sug">→ <Ruby text={f.suggestion} /></span>}
-            </div>
-          </div>
+          <FindingRow key={i} f={f} lang={lang} />
         ))}
       </div>
 

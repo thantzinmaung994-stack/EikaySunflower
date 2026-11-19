@@ -93,4 +93,10 @@ describe('resident words and free-text fields', () => {
     const r2 = evaluate({ ...base, fields: { ...base.fields, place: '食堂' } }, sc, categoryById(sc.category));
     expect(r2.fieldHits.find((h) => h.id === 'place')?.ok).toBe(false);
   });
+
+  it('「かわいそうだった」は感情として1回だけ指摘し、推測（そうだ）とは数えない', () => {
+    const f = checkSoap({ s: '「痛い」', o: '7:30 体温37.8℃。かわいそうだった。', a: '発熱の可能性がある。', p: '看護師に報告する。' });
+    expect(f.filter((x) => x.code === 'feeling').length).toBe(1);
+    expect(f.filter((x) => x.code === 'speculation').length).toBe(0);
+  });
 });

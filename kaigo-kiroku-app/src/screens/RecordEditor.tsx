@@ -3,6 +3,8 @@ import { FieldInput } from '../components/FieldInput';
 import { Ruby } from '../components/Ruby';
 import { Speak } from '../components/Speak';
 import { ResultPanel } from '../components/ResultPanel';
+import { AttemptCompare } from '../components/AttemptCompare';
+import type { Attempt } from '../lib/attempts';
 import { CATEGORIES, categoryById, catName } from '../data/categories';
 import { t } from '../i18n';
 import { evaluate, type CheckResult } from '../lib/checker';
@@ -31,7 +33,13 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
   const [w, setW] = useState<FiveW1H>(EMPTY_W);
   const [soap, setSoap] = useState<Soap>(EMPTY_SOAP);
   const [result, setResult] = useState<CheckResult | null>(null);
+  /** 書き直す前の回（採点のたびに、前の回をここに残す） */
+  const [history, setHistory] = useState<Attempt[]>([]);
+  /** 最後に採点したときの SOAP（比べるときの「今回」） */
+  const [checkedSoap, setCheckedSoap] = useState<Soap>(EMPTY_SOAP);
   const [savedId, setSavedId] = useState<string | null>(null);
+  /** 今の採点結果を保存したか（書き直して採点し直すと、また保存できる） */
+  const [saved, setSaved] = useState(false);
   const [error, setError] = useState('');
 
   const steps = useMemo(() => (scenario ? ['scene', 'fields', 'w', 'soap', 'result'] : ['fields', 'w', 'soap', 'result']), [scenario]);
@@ -63,7 +71,10 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
     setError('');
     const entry = buildEntry();
     const r = evaluate(entry, scenario, category);
+    if (result) setHistory((h) => [...h, { soap: checkedSoap, result }]);
+    setCheckedSoap(soap);
     setResult(r);
+    setSaved(false);
     go(1);
   };
 
@@ -71,6 +82,7 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
     const entry = buildEntry();
     entry.score = result?.score;
     setSavedId(entry.id);
+    setSaved(true);
     onSave(entry);
   };
 
@@ -186,7 +198,10 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
       )}
 
       {step === 'result' && result && (
-        <ResultPanel result={result} scenario={scenario} lang={lang} />
+        <>
+          <AttemptCompare lang={lang} history={history} soap={checkedSoap} result={result} scored={!!scenario} />
+          <ResultPanel result={result} scenario={scenario} lang={lang} />
+        </>
       )}
 
       <div className="row" style={{ marginTop: 8 }}>
@@ -195,8 +210,8 @@ export function RecordEditor({ lang, scenario, initialCategory, onSave, onExit }
         )}
         {step === 'result' ? (
           <>
-            <button className="btn ghost" onClick={() => go(-1)}>{t(lang, 'tryAgain')}</button>
-            <button className="btn" onClick={save} disabled={!!savedId}>{savedId ? '✓ ' : ''}{t(lang, 'save')}</button>
+            <button className="btn ghost" onClick={() => go(-1)}>✏️ {t(lang, 'rewrite')}</button>
+            <button className="btn" onClick={save} disabled={saved}>{saved ? '✓ ' : ''}{savedId && !saved ? t(lang, 'saveUpdate') : t(lang, 'save')}</button>
             <button className="btn secondary" onClick={onExit}>{t(lang, 'toHistory')}</button>
           </>
         ) : step === 'soap' ? (

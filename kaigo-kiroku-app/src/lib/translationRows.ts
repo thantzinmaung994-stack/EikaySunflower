@@ -4,11 +4,13 @@ import { GLOSSARY } from '../data/glossary';
 import { LESSONS } from '../data/lessons';
 import { SCENARIOS } from '../data/scenarios';
 import { JA } from '../i18n';
+import { FINDING_JA } from './checker';
 
 /** 翻訳表（translations/myanmar.csv）に載せる行：[key, 種類, 日本語] */
 export function sourceRows(): [key: string, kind: string, ja: string][] {
   const rows: [string, string, string][] = [];
   for (const [k, v] of Object.entries(JA)) rows.push([`ui.${k}`, '画面の文字', v]);
+  for (const [k, v] of Object.entries(FINDING_JA)) rows.push([`finding.${k}`, '採点の説明', v]);
   for (const c of CATEGORIES) rows.push([`category.${c.id}`, '記録の種類', c.name]);
   for (const l of LESSONS) rows.push([`lesson.${l.id}.title`, '学ぶ（見出し）', l.title]);
   for (const s of SCENARIOS) {
