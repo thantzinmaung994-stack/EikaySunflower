@@ -304,3 +304,7 @@ a.btn { text-decoration: none; }
 .compare-whole { flex: 1; display: grid; gap: 4px; }
 .compare-whole small { color: var(--muted); font-size: 12px; }
 .compare-whole p { flex: none; }
+
+/* 採点の説明をミャンマー語で */
+.my-explain-btn { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; border: 1px solid currentColor; background: #fff; color: var(--navy); border-radius: 999px; padding: 3px 10px; font-size: 13px; font-weight: 700; opacity: .9; }
+.my-explain { margin: 6px 0 0; padding: 8px 10px; background: #fff; border-radius: 8px; border: 1px dashed var(--line); color: var(--ink, #1f2937); font-size: 14px; line-height: 1.9; }

@@ -4,6 +4,7 @@ import { charDiff, compareFindings, sameRatio, type Attempt } from '../lib/attem
 import type { CheckResult } from '../lib/checker';
 import type { Lang, Soap } from '../types';
 import { Ruby } from './Ruby';
+import { FindingRow } from './FindingRow';
 
 interface Props {
   lang: Lang;
@@ -53,10 +54,7 @@ export function AttemptCompare({ lang, history, soap, result, scored }: Props) {
         <>
           <h3>✓ <Ruby text={t(lang, 'compareFixed')} />（{fixed.length}）</h3>
           {fixed.map((f, i) => (
-            <div key={i} className="finding good">
-              <span className="part">{f.part}</span>
-              <div>{f.match && <mark>{f.match}</mark>} <Ruby text={f.message.replace(`「${f.match}」`, '')} /></div>
-            </div>
+            <FindingRow key={i} f={{ ...f, suggestion: undefined }} lang={lang} tone="good" />
           ))}
         </>
       )}
@@ -64,10 +62,7 @@ export function AttemptCompare({ lang, history, soap, result, scored }: Props) {
         <>
           <h3>⚠ <Ruby text={t(lang, 'compareAdded')} />（{added.length}）</h3>
           {added.map((f, i) => (
-            <div key={i} className={`finding ${f.severity}`}>
-              <span className="part">{f.part}</span>
-              <div>{f.match && <mark>{f.match}</mark>} <Ruby text={f.message.replace(`「${f.match}」`, '')} /></div>
-            </div>
+            <FindingRow key={i} f={f} lang={lang} />
           ))}
         </>
       )}

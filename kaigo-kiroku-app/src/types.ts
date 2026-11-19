@@ -103,6 +103,8 @@ export interface Finding {
   severity: Severity;
   part: string;
   message: string;
+  /** 説明の種類（ミャンマー語訳 finding.<textKey> を引くため） */
+  textKey?: string;
   /** 該当した語句 */
   match?: string;
   suggestion?: string;

@@ -27,3 +27,14 @@ describe('parseCsv', () => {
     expect(parseCsv('﻿a,b\r\n"x, ""y""","line1\nline2"\r\n')).toEqual([['a', 'b'], ['x, "y"', 'line1\nline2']]);
   });
 });
+
+describe('採点の説明のミャンマー語', () => {
+  it('すべての指摘の種類に訳があり、語句の場所 {w} を持つものは訳にも {w} がある', async () => {
+    const { FINDING_JA } = await import('./checker');
+    for (const [k, ja] of Object.entries(FINDING_JA)) {
+      const m = my(`finding.${k}`);
+      expect(m, k).toBeTruthy();
+      if (ja.includes('{w}')) expect(m, k).toContain('{w}');
+    }
+  });
+});
